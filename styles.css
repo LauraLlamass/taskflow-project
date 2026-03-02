@@ -65,7 +65,19 @@ main {
 }
 
 @media (max-width: 768px) {
-  main {
-    flex-direction: column;
-  }
+
+    main {
+        flex-direction: column;
+    }
+
+    aside {
+        margin-bottom: var(--spacing-large);
+    }
+
+    .curso {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-small);
+    }
+
 }
