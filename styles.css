@@ -1,21 +1,24 @@
 :root {
-    /* Colocar variables */
-    --color-fondo: rgb(255, 254, 224);
-    --color-texto: #222B36;
+  --color-fondo: #FAF5F8;
+  --color-texto: #2E1F27;
 
-    --tamaño-texto-titulo: 32px;
-    --tamaño-texto-titulo2: 24px;
-    --tamaño-texto-cuerpo: 16px;
+  --color-acento: #B76E79;
+  --color-verde: #6BBF9E;
+  --color-rojo: #C94F7C;
 
-    --fuente-titulo: Georgia, serif;
-    --fuente-texto: Montserrat, sans-serif;
+  --tamaño-texto-titulo: 40px;
+  --tamaño-texto-titulo2: 28px;
+  --tamaño-texto-cuerpo: 22px;
 
-    --spacing-small: 8px;
-    --spacing-medium: 16px;
-    --spacing-large: 32px;
+  --fuente-titulo: Georgia, serif;
+  --fuente-texto: Cambria, sans-serif;
+
+  --spacing-small: 8px;
+  --spacing-medium: 16px;
+  --spacing-large: 32px;
 }
 
-    /*estilos generales*/
+    /*Estilos generales*/
 body {
     background-color: var(--color-fondo);
     color: var(--color-texto);
@@ -28,21 +31,70 @@ body {
 h1 {
     font-family: var(--fuente-titulo);
     font-size: var(--tamaño-texto-titulo);
+    text-align: center;
+    letter-spacing: 1px;
+    margin-bottom: var(--spacing-large);
 }
+    /*Estilo de titulo2*/
 h2 {
     font-family: var(--fuente-titulo);
     font-size: var(--tamaño-texto-titulo2);
 }
 
-.curso {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-medium);
+
+    /*Titulo principal*/
+.header-principal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-large);
+  padding-bottom: var(--spacing-medium);
+  border-bottom: 3px solid var(--color-acento) ;
 }
 
-.curso h3 {
-    margin: 0;
+.tagline{
+  margin: 6px 0 0;
+  font-size: 16px;
+  opacity: 0.75;
+}
+
+
+.logo {
+  margin: 0;
+  font-family: var(--fuente-titulo);
+  font-size: 28px;
+  color: var(--color-acento);
+  letter-spacing: 2px;
+}
+
+
+/*nav drch*/
+nav a{
+  color: var(--color-acento);
+  text-decoration: none;
+  margin-left: 16px;
+  transition: opacity 0.2s ease;
+}
+nav a:hover{ opacity: 0.65; }
+
+.curso {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-medium);
+  padding: var(--spacing-medium);
+  background-color: #FFFFFF;
+  border-radius: 14px;
+  border: 1px solid rgba(183,110,121,0.18); /* acento suave */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.curso:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
+
+section {
+  flex: 1;
 }
 
 .badge {
@@ -52,32 +104,115 @@ h2 {
     color: whitesmoke;
 }
 
+
+/*color estado abierto-cerrado*/
 .abierto {
-    background-color: rgb(8, 149, 102);
+  background-color: var(--color-verde);
 }
+
 .cerrado {
-    background-color: brown;
+  background-color: var(--color-rojo);
 }
+
 
 main {
   display: flex;
   gap: var(--spacing-large);
+  max-width: none;
+  margin: 0;
+  padding: var(--spacing-medium);
+}
+
+.cursos-grid {
+  display: flex;
+  gap: var(--spacing-large);
+}
+
+/* 1) ocultar checkbox */
+.toggle {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 2) Estilo base del "botón" */
+.btn-apuntar {
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  font-family: inherit;
+  background: var(--color-acento); /* estado Apuntar */
+}
+
+/* 3) Texto por defecto */
+.btn-apuntar::before {
+  content: "Apuntar";
+}
+
+/* 4) Cuando está checkeado, cambia color y texto */
+.toggle:checked + .btn-apuntar {
+  background: var(--color-verde);
+}
+
+.toggle:checked + .btn-apuntar::before {
+  content: "Apuntado";
+}
+
+.btn-apuntar {
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-apuntar:active {
+  transform: scale(0.98);
 }
 
 @media (max-width: 768px) {
 
-    main {
-        flex-direction: column;
-    }
+  /* header entero y bajar tagline */
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-small);
+    padding: 0 var(--spacing-medium) var(--spacing-medium);
+  }
 
-    aside {
-        margin-bottom: var(--spacing-large);
-    }
+  nav {
+    width: 100%;
+    display: flex;
+    gap: var(--spacing-small);
+    flex-wrap: wrap; /* links bajan si no caben */
+  }
 
-    .curso {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-small);
-    }
+  /* MAIN fila a columna */
+  main {
+    flex-direction: column;
+    padding: 0 var(--spacing-medium);
+  }
 
+  /* ocupar movil ancho */
+  aside {
+    width: 100%;
+    margin-bottom: var(--spacing-large);
+  }
+
+  /* titulo más pequeño en móvil */
+  section h1 {
+    font-size: 30px;
+    line-height: 1.1;
+  }
+
+  /* TARJETAS: 1 columna y centradas */
+  .cursos-grid {
+    grid-template-columns: 1fr;
+    max-width: 520px; /* opcional: limita ancho para que no quede gigante */
+    margin: 0 auto;   /* centra el bloque */
+  }
+
+  /* CONTENIDO DE CADA CURSO: apilado */
+  .curso {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-small);
+  }
 }
