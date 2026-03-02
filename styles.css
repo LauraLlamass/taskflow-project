@@ -1,0 +1,71 @@
+:root {
+    /* Colocar variables */
+    --color-fondo: rgb(255, 254, 224);
+    --color-texto: #222B36;
+
+    --tamaño-texto-titulo: 32px;
+    --tamaño-texto-titulo2: 24px;
+    --tamaño-texto-cuerpo: 16px;
+
+    --fuente-titulo: Georgia, serif;
+    --fuente-texto: Montserrat, sans-serif;
+
+    --spacing-small: 8px;
+    --spacing-medium: 16px;
+    --spacing-large: 32px;
+}
+
+    /*estilos generales*/
+body {
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    font-family: var(--fuente-texto);
+    font-size: var(--tamaño-texto-cuerpo);
+    margin: 0;
+    padding: var(--spacing-medium);
+}
+    /*Estilos de titulo*/  
+h1 {
+    font-family: var(--fuente-titulo);
+    font-size: var(--tamaño-texto-titulo);
+}
+h2 {
+    font-family: var(--fuente-titulo);
+    font-size: var(--tamaño-texto-titulo2);
+}
+
+.curso {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-medium);
+}
+
+.curso h3 {
+    margin: 0;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: whitesmoke;
+}
+
+.abierto {
+    background-color: rgb(8, 149, 102);
+}
+.cerrado {
+    background-color: brown;
+}
+
+main {
+  display: flex;
+  gap: var(--spacing-large);
+}
+
+@media (max-width: 768px) {
+  main {
+    flex-direction: column;
+  }
+}
