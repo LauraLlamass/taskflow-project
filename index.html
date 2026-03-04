@@ -25,18 +25,14 @@
   <main>
         
     <aside>
-        <h2>Curso</h2>
-          <ul>
-            <li>Descripción</li>
-            <li>Funcionamiento</li>
-            <li>Grupos</li>
-            <li>Objetivos</li>
-            <li>Cursos actuales</li>
-            <li>Profesores</li>
-            <li>Precio y pago</li>
-            <li>Contacto</li>
-          </ul>
-    </aside>
+  <ul class="menu-curso" id="menu-curso">
+    <li><button type="button" data-seccion="descripción">Descripción</button></li>
+    <li><button type="button" data-seccion="funcionamiento">Funcionamiento</button></li>
+    <li><button type="button" data-seccion="objetivos">Objetivos</button></li>
+    <li><button type="button" data-seccion="cursos">Cursos actuales</button></li>
+    <li><button type="button" data-seccion="contacto">Contacto</button></li>
+  </ul>
+</aside>
 
     <section>
       <h1>Cursos más populares</h1>
@@ -54,9 +50,21 @@
               <h3>¿Cómo usar sinónimos?</h3>
               <p>Géneros: Todos</p>
         </div>
+        
       <input type="checkbox" id="apuntar-2" class="toggle">
       <label for="apuntar-2" class="badge btn-apuntar"></label>    </div>
+      <div class="curso">
+          <div class="curso-info">
+              <h3>Construcción de mundos</h3>
+              <p>Géneros: Fantasía y Ciencia-Ficción</p>
         </div>
+        
+      <input type="checkbox" id="apuntar-3" class="toggle">
+      <label for="apuntar-3" class="badge btn-apuntar"></label>    </div>    
+    
+        </div>
+
+        
     </section>
 
     
@@ -65,10 +73,13 @@
 
   <section id="comentarios">
   <h2>Crea con estas ideas</h2>
-    <form id="idea-form">
-        <input id="idea-input" type="text" placeholder="Escribe una idea..." autocomplete="off">
-        <button type="submit">Añadir idea</button>
-    </form>
+
+<input id="idea-search" type="text" placeholder="Buscar ideas..." autocomplete="off">
+
+  <form id="idea-form">
+    <input id="idea-input" type="text" placeholder="Escribe una idea..." autocomplete="off">
+    <button type="submit">Añadir</button>
+  </form>
 
   <ul id="idea-list">
     <li>Un pueblo donde nadie puede mentir</li>

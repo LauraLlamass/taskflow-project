@@ -18,64 +18,93 @@
   --spacing-large: 32px;
 }
 
-    /*Estilos generales*/
+/* Estilos generales */
 body {
-    background-color: var(--color-fondo);
-    color: var(--color-texto);
-    font-family: var(--fuente-texto);
-    font-size: var(--tamaño-texto-cuerpo);
-    margin: 0;
-    padding: var(--spacing-medium);
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--fuente-texto);
+  font-size: var(--tamaño-texto-cuerpo);
+  margin: 0;
+  padding: var(--spacing-medium);
 }
-    /*Estilos de titulo*/  
+
+/* Títulos */
 h1 {
-    font-family: var(--fuente-titulo);
-    font-size: var(--tamaño-texto-titulo);
-    text-align: center;
-    letter-spacing: 1px;
-    margin-bottom: var(--spacing-large);
+  font-family: var(--fuente-titulo);
+  font-size: var(--tamaño-texto-titulo);
+  text-align: center;
+  letter-spacing: 1px;
+  margin-bottom: var(--spacing-large);
 }
-    /*Estilo de titulo2*/
+
 h2 {
-    font-family: var(--fuente-titulo);
-    font-size: var(--tamaño-texto-titulo2);
+  font-family: var(--fuente-titulo);
+  font-size: var(--tamaño-texto-titulo2);
 }
 
-
-    /*Titulo principal*/
-.header-principal {
+/* Header */
+.header-principal{
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  gap: 8px;
   margin-bottom: var(--spacing-large);
   padding-bottom: var(--spacing-medium);
-  border-bottom: 3px solid var(--color-acento) ;
+  border-bottom: 3px solid var(--color-acento);
+  text-align: center;
 }
 
 .tagline{
-  margin: 6px 0 0;
+  margin: 0;
   font-size: 16px;
   opacity: 0.75;
 }
 
-
-.logo {
+.logo{
   margin: 0;
   font-family: var(--fuente-titulo);
-  font-size: 28px;
+  font-size: 34px;
   color: var(--color-acento);
   letter-spacing: 2px;
 }
+/* Nav */
+.header-principal nav{
+  position: absolute;
+  right: 40px;
+  top: 35px;
+  display: flex;
+  gap: 18px;
+}
 
-
-/*nav drch*/
-nav a{
+.header-principal nav a{
   color: var(--color-acento);
   text-decoration: none;
-  margin-left: 16px;
   transition: opacity 0.2s ease;
+  margin-left: 0; /* quitamos el margin-left anterior */
 }
-nav a:hover{ opacity: 0.65; }
+
+.header-principal nav a:hover{
+  opacity: 0.65;
+}
+
+/* Main layout */
+main {
+  display: flex;
+  gap: var(--spacing-large);
+  max-width: none;
+  margin: 0;
+  padding: var(--spacing-medium);
+}
+
+section {
+  flex: 1;
+}
+
+/* Cursos */
+.cursos-grid {
+  display: flex;
+  gap: var(--spacing-large);
+}
 
 .curso {
   display: flex;
@@ -85,165 +114,272 @@ nav a:hover{ opacity: 0.65; }
   padding: var(--spacing-medium);
   background-color: #FFFFFF;
   border-radius: 14px;
-  border: 1px solid rgba(183,110,121,0.18); /* acento suave */
+  border: 1px solid rgba(183,110,121,0.18);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .curso:hover{
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 26px rgba(0,0,0,0.08);
 }
 
-section {
-  flex: 1;
-}
-
-.badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    color: whitesmoke;
-}
-
-
-/*color estado abierto-cerrado*/
-.abierto {
-  background-color: var(--color-verde);
-}
-
-.cerrado {
-  background-color: var(--color-rojo);
-}
-
-
-main {
-  display: flex;
-  gap: var(--spacing-large);
-  max-width: none;
+.menu-curso{
+  list-style: none;
+  padding: 0;
   margin: 0;
-  padding: var(--spacing-medium);
+  display: grid;
+  gap: 8px;
 }
 
-.cursos-grid {
-  display: flex;
-  gap: var(--spacing-large);
+.menu-curso button{
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(183,110,121,0.18);
+  background: rgba(255,255,255,0.55);
+  cursor: pointer;
+  font: inherit;
 }
 
-/* 1) ocultar checkbox */
+.menu-curso button:hover{
+    transform: translateX(3px);
+  background: rgba(183,110,121,0.10);
+}
+
+.menu-curso button.activo{
+  background: rgba(183,110,121,0.18);
+  border-color: rgba(183,110,121,0.35);
+}
+
+.panel-curso{
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(183,110,121,0.18);
+}
+
+.panel-curso h2{
+  margin: 0 0 8px;
+}
+
+
+/* Badge / botón Apuntar */
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  color: whitesmoke;
+}
+
+.abierto { background-color: var(--color-verde); }
+.cerrado { background-color: var(--color-rojo); }
+
+/* Ocultar checkbox */
 .toggle {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
 
-/* 2) Estilo base del "botón" */
+/* Botón Apuntar */
 .btn-apuntar {
   display: inline-block;
   cursor: pointer;
   user-select: none;
   border: none;
   font-family: inherit;
-  background: var(--color-acento); /* estado Apuntar */
-}
-
-/* 3) Texto por defecto */
-.btn-apuntar::before {
-  content: "Apuntar";
-}
-
-/* 4) Cuando está checkeado, cambia color y texto */
-.toggle:checked + .btn-apuntar {
-  background: var(--color-verde);
-}
-
-.toggle:checked + .btn-apuntar::before {
-  content: "Apuntado";
-}
-
-.btn-apuntar {
+  background: var(--color-acento);
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.btn-apuntar:active {
-  transform: scale(0.98);
+.btn-apuntar::before { content: "Apuntar"; }
+
+.toggle:checked + .btn-apuntar {
+  background: var(--color-verde);
+}
+.toggle:checked + .btn-apuntar::before { content: "Apuntado"; }
+
+.btn-apuntar:active { transform: scale(0.98); }
+
+/* SECCIÓN IDEAS */
+
+#comentarios{
+  margin-top: 48px;
+  padding: 24px;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(183,110,121,0.18);
+  border-radius: 18px;
 }
 
-
-#comentarios {
-  margin-top: 32px;
-  padding: 16px;
-}
-
-
-#idea-list{
-display:grid;
-grid-template-columns: repeat(3, 1fr);
-gap:16px;
-list-style:none;
-padding:0;
-}
-
-#idea-list li{
-background:white;
-padding:12px;
-border-radius:12px;
-border:1px solid rgba(0,0,0,0.1);
-box-shadow:0 3px 8px rgba(0,0,0,0.08);
-display:flex;
-flex-direction:column;
-justify-content:space-between;
-
-  /*tarjeta */
-  max-width: 320px;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-#idea-list li button{
-  align-self:flex-end;
-  background: transparent;
-  border: none;
-  cursor:pointer;
-  font-size:18px;
-  opacity:0.35;
-  padding: 6px;
-  border-radius: 10px;
-}
-
-#idea-list li button:hover{
-  opacity:1;
-  background: rgba(183,110,121,0.12);
-}
-
+/* Buscador */
 #idea-search{
   width: 100%;
   max-width: 520px;
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.15);
+  background: white;
   font: inherit;
+  outline: none;
   margin: 10px 0 12px;
 }
 
-.badge-profe{
-  align-self:flex-start;
-  font-size: 12px;
-  padding: 4px 8px;
+#idea-search:focus{
+  border-color: var(--color-acento);
+  box-shadow: 0 0 0 3px rgba(183,110,121,0.12);
+}
+
+#idea-form{
+  position: relative;
+  width: 520px;         
+  max-width: 100%;     
+  margin: 12px 0 18px;
+}
+
+#idea-input{
+  width: 100%;
+  box-sizing: border-box;             
+  padding: 10px 120px 10px 14px;     
   border-radius: 999px;
-  background: var(--color-acento);
-  color: var(--color-fondo);
-  margin-bottom: 8px;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: white;
+  font: inherit;
+  outline: none;
 }
 
 
+#idea-input:focus{
+  border-color: var(--color-acento);
+  box-shadow: 0 0 0 3px rgba(183,110,121,0.12);
+}
+
+/* Botón "Añadir" dentro del input (derecha) */
+#idea-form button{
+  position: absolute;
+  right: 8px;                          /* pegado a la derecha */
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: none;
+  background: var(--color-acento);
+  color: white;
+  font: inherit;
+  cursor: pointer;
+  z-index: 2;
+  transition: opacity 0.15s ease;
+}
+
+#idea-form button:hover{ opacity: 0.9; }
+
+#idea-form button:active{ opacity: 0.85; }
+
+/* Grid de tarjetas */
+#idea-list{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+
+/* Tarjeta */
+#idea-list li{
+  background: white;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  min-height: 110px;
+}
+
+#idea-list li:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(0,0,0,0.08);
+}
+
+/* Botón papelera (solo para ideas de usuario) */
+#idea-list li button{
+  align-self: flex-end;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 6px;
+  border-radius: 10px;
+  opacity: 0.35; 
+  transition: opacity 0.2s ease, background 0.2s ease;
+}
 
 
+#idea-list li button:hover{
+  opacity: 1;
+  background: rgba(183,110,121,0.12);
+}
 
+/* Badge Profesora */
+.badge-profe{
+  align-self: flex-start;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--color-acento);
+  color: white;
+  margin-bottom: 8px;
+  letter-spacing: 0.2px;
+}
 
+/*Marcar tarjetas de profes */
+.idea-profesor{
+  border-left: 4px solid var(--color-acento);
+}
 
+/* Animación aparición de tarjetas */
+#idea-list li{
+  animation: aparecer 0.25s ease;
+}
+
+@keyframes aparecer{
+  from{
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to{
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animación al borrar tarjeta */
+.borrando{
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+@keyframes borrarIdea{
+  from{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to{
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* RESPONSIVE */
 
 @media (max-width: 768px) {
 
-  /* header entero y bajar tagline */
   header {
     flex-direction: column;
     align-items: flex-start;
@@ -255,42 +391,41 @@ justify-content:space-between;
     width: 100%;
     display: flex;
     gap: var(--spacing-small);
-    flex-wrap: wrap; /* links bajan si no caben */
+    flex-wrap: wrap;
   }
 
-  /* MAIN fila a columna */
   main {
     flex-direction: column;
     padding: 0 var(--spacing-medium);
   }
 
-  /* ocupar movil ancho */
   aside {
     width: 100%;
     margin-bottom: var(--spacing-large);
   }
 
-  /* titulo más pequeño en móvil */
   section h1 {
     font-size: 30px;
     line-height: 1.1;
   }
 
-  /* TARJETAS: 1 columna y centradas */
   .cursos-grid {
     grid-template-columns: 1fr;
-    max-width: 320px; /* opcional: limita ancho para que no quede gigante */
-    margin: 0 auto;   /* centra el bloque */
+    max-width: 320px;
+    margin: 0 auto;
   }
 
-  /* CONTENIDO DE CADA CURSO: apilado */
   .curso {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-small);
   }
-  #idea-list{
-  grid-template-columns: 1fr;
-}
 
+  #idea-list{
+    grid-template-columns: 1fr;
+  }
+
+  #idea-form, #idea-search{
+    max-width: 100%;
+  }
 }

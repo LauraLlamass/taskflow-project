@@ -9,7 +9,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const ideasProfes = [
     "Un pueblo donde nadie puede mentir",
     "Una biblioteca que reescribe finales",
-    "Un villano que cree ser el héroe",
     "Una escritora que cae dentro de su historia y sus personajes le recriminan",
   ];
 
@@ -43,11 +42,17 @@ document.addEventListener("DOMContentLoaded", () => {
       const button = document.createElement("button");
       button.textContent = "🗑️";
 
-      button.addEventListener("click", () => {
-        ideas = ideas.filter((idea) => idea !== texto);
-        guardarIdeas();
-        li.remove();
-      });
+button.addEventListener("click", () => {
+
+  li.classList.add("borrando");
+
+  setTimeout(() => {
+    ideas = ideas.filter((idea) => idea !== texto);
+    guardarIdeas();
+    li.remove();
+  }, 250);
+
+});
 
       li.appendChild(button);
     }
@@ -66,8 +71,10 @@ document.addEventListener("DOMContentLoaded", () => {
   list.innerHTML = "";
   ideasProfes.forEach((idea) => pintarIdeaEnDOM(idea, true));
 
-  cargarIdeas();
-  ideas.forEach((idea) => pintarIdeaEnDOM(idea, false));
+    cargarIdeas();
+    for (let i = ideas.length - 1; i >= 0; i--) {
+    pintarIdeaEnDOM(ideas[i], false);
+    }
 
   // Submit
   form.addEventListener("submit", (event) => {
@@ -96,4 +103,56 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+
+  const menuCurso = document.querySelector("#menu-curso");
+const panelTitulo = document.querySelector("#panel-titulo");
+const panelTexto = document.querySelector("#panel-texto");
+
+const contenido = {
+  descripcion: {
+    titulo: "Descripción",
+    texto: "Cursos cortos para mejorar tu escritura con ejercicios prácticos y feedback."
+  },
+  funcionamiento: {
+    titulo: "Funcionamiento",
+    texto: "Clases en sesiones breves con tareas semanales y material descargable."
+  },
+  grupos: {
+    titulo: "Grupos",
+    texto: "Grupos reducidos para poder corregir y comentar textos con calma."
+  },
+  objetivos: {
+    titulo: "Objetivos",
+    texto: "Aprender técnicas narrativas, ampliar vocabulario y ganar confianza al escribir."
+  },
+  cursos: {
+    titulo: "Cursos actuales",
+    texto: "Consulta los cursos disponibles arriba y apúntate con el botón 'Apuntar'."
+  },
+  profesores: {
+    titulo: "Profesoras",
+    texto: "Equipo de profesoras con experiencia en narrativa, revisión y talleres."
+  },
+  precio: {
+    titulo: "Precio y pago",
+    texto: "Pago mensual o por curso. Descuentos por packs de cursos."
+  },
+  contacto: {
+    titulo: "Contacto",
+    texto: "Escríbenos para dudas, disponibilidad y plazas. Respuesta en 24/48h."
+  }
+};
+
+menuCurso.addEventListener("click", (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+
+  const seccion = btn.dataset.seccion;
+  panelTitulo.textContent = contenido[seccion].titulo;
+  panelTexto.textContent = contenido[seccion].texto;
+
+  // marcar activo
+  menuCurso.querySelectorAll("button").forEach(b => b.classList.remove("activo"));
+  btn.classList.add("activo");
+});
 });
