@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector("#idea-form");
   const input = document.querySelector("#idea-input");
   const list = document.querySelector("#idea-list");
-  const search = document.querySelector("#idea-search"); // puede ser null si no existe
+  const search = document.querySelector("#idea-search"); 
 
   const ideasProfes = [
     "Un pueblo donde nadie puede mentir",
@@ -65,9 +65,9 @@ button.addEventListener("click", () => {
       if (primeraUsuario) list.insertBefore(li, primeraUsuario);
       else list.appendChild(li);
     }
-  } // <-- ESTA llave te faltaba
+  }
 
-  // Al iniciar
+  // iniciar lista
   list.innerHTML = "";
   ideasProfes.forEach((idea) => pintarIdeaEnDOM(idea, true));
 
@@ -83,7 +83,7 @@ button.addEventListener("click", () => {
     const texto = input.value.trim();
     if (texto === "") return;
 
-    ideas.unshift(texto); // así las nuevas quedan las primeras del usuario también en memoria
+    ideas.unshift(texto); 
     guardarIdeas();
     pintarIdeaEnDOM(texto, false);
 
@@ -91,7 +91,7 @@ button.addEventListener("click", () => {
     input.focus();
   });
 
-  // Buscador (si existe)
+  // Buscador 
   if (search) {
     search.addEventListener("input", () => {
       const q = search.value.toLowerCase();
@@ -104,7 +104,7 @@ button.addEventListener("click", () => {
     });
   }
 
-  const menuCurso = document.querySelector("#menu-curso");
+const menuCurso = document.querySelector("#menu-curso");
 const panelTitulo = document.querySelector("#panel-titulo");
 const panelTexto = document.querySelector("#panel-texto");
 
@@ -133,10 +133,7 @@ const contenido = {
     titulo: "Profesoras",
     texto: "Equipo de profesoras con experiencia en narrativa, revisión y talleres."
   },
-  precio: {
-    titulo: "Precio y pago",
-    texto: "Pago mensual o por curso. Descuentos por packs de cursos."
-  },
+  
   contacto: {
     titulo: "Contacto",
     texto: "Escríbenos para dudas, disponibilidad y plazas. Respuesta en 24/48h."
