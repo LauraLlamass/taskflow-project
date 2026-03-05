@@ -113,7 +113,7 @@ section {
   align-items: center;
   gap: var(--spacing-medium);
   padding: var(--spacing-medium);
-  background-color: #FFFFFF;
+  /*background-color: #FFFFFF;*/
   border-radius: 14px;
   border: 1px solid rgba(183,110,121,0.18);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -396,12 +396,12 @@ section {
   align-items: center;
 }
 
-  .header-principal nav{
+ /* .header-principal nav{
   position: static;
   margin-top: 10px;
   justify-content: center;
 }
-
+*/
   nav {
     width: 100%;
     display: flex;

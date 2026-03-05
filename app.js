@@ -5,12 +5,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.querySelector("#idea-input");
   const list = document.querySelector("#idea-list");
   const search = document.querySelector("#idea-search"); 
-
   const ideasProfes = [
     "Un pueblo donde nadie puede mentir",
     "Una biblioteca que reescribe finales",
     "Una escritora que cae dentro de su historia y sus personajes le recriminan",
   ];
+  const toggleBtn = document.querySelector("#theme-toggle");
+const root = document.documentElement; // <html>
+
+/*Preferncia guardada*/
+const savedTheme = localStorage.getItem("theme");
+if (savedTheme === "dark") {
+  root.classList.add("dark");
+  toggleBtn.textContent = "☀️";
+} else {
+  root.classList.remove("dark");
+  toggleBtn.textContent = "🌙";
+}
+
+/*Alternancia estilo*/
+toggleBtn.addEventListener("click", () => {
+  const isDark = root.classList.toggle("dark");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+  toggleBtn.textContent = isDark ? "☀️" : "🌙";
+});
 
   let ideas = [];
 
@@ -25,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function pintarIdeaEnDOM(texto, fija = false) {
     const li = document.createElement("li");
+    li.className = "bg-white p-4 rounded-xl border border-black/10 shadow-sm hover:-translate-y-1 hover:shadow-md transition";
     if (fija) li.classList.add("idea-profesor");
 
     if (fija) {
@@ -36,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const span = document.createElement("span");
     span.textContent = texto;
+    span.classList.add("text-[#2E1F27]");
     li.appendChild(span);
 
     if (!fija) {

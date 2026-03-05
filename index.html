@@ -1,96 +1,88 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cursos de escritura</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="app.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cursos de escritura</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script> tailwind.config = { darkMode: 'class' }</script>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
 </head>
-<body>
 
-<header class="header-principal">
-  <h1 class="logo">Escritura creativa</h1>
-  <p class="tagline">Cursos cortos para escribir con estilo y confianza</p>
+<body class="bg-[#FAF5F8] text-[#2E1F27] p-4 font-serif dark:bg-slate-900 dark:text-slate-100">  
+  <header class="relative w-full flex flex-col items-center gap-2 mb-8 pb-4 border-b-2 border-[#B76E79] text-center">
+    <h1 class="logo text-3xl md:text-4xl tracking-wider text-[#B76E79] font-bold font-serif m-0">Escritura creativa </h1>
+    <p class="tagline text-sm opacity-75 m-0">Cursos cortos para escribir con estilo y confianza</p>
 
+  </header>
 
-  <nav>
-    <a href="#inicio">Inicio</a>
-    <a href="#cursos">Cursos</a>
-    <a href="#contacto">Contacto</a>
-  </nav>
+  <button id="theme-toggle" type="button" class="fixed top-4 right-4 rounded-full px-4 py-2 bg-[#B76E79] text-white shadow-md hover:opacity-90 transition">🌙</button>
 
-</header>
+  <main class="flex flex-col md:flex-row gap-8 mt-8 items-start">    
+    <aside class="w-full md:w-64">
+      <ul class="menu-curso list-none p-0 m-0 grid gap-2" id="menu-curso">
+        <button type="button"  data-seccion="descripcion" class="w-full text-left px-3 py-2 rounded-xl border border-[#B76E79]/20 bg-white/60 hover:bg-[#B76E79]/10 transition focus-visible:ring-2 focus-visible:ring-[#B76E79]">Descripción</button>
+        <button type="button"  data-seccion="funcionamiento" class="w-full text-left px-3 py-2 rounded-xl border border-[#B76E79]/20 bg-white/60 hover:bg-[#B76E79]/10 transition focus-visible:ring-2 focus-visible:ring-[#B76E79]" >Funcionamiento</button>
+        <button type="button"  data-seccion="objetivos" class="w-full text-left px-3 py-2 rounded-xl border border-[#B76E79]/20 bg-white/60 hover:bg-[#B76E79]/10 transition focus-visible:ring-2 focus-visible:ring-[#B76E79]" >Objetivos</button>
+        <button type="button"  data-seccion="cursos" class="w-full text-left px-3 py-2 rounded-xl border border-[#B76E79]/20 bg-white/60 hover:bg-[#B76E79]/10 transition focus-visible:ring-2 focus-visible:ring-[#B76E79]" >Cursos actuales</button>
+        <button type="button"  data-seccion="contacto" class="w-full text-left px-3 py-2 rounded-xl border border-[#B76E79]/20 bg-white/60 hover:bg-[#B76E79]/10 transition focus-visible:ring-2 focus-visible:ring-[#B76E79]" >Contacto</button>
+      </ul>
+    </aside>
 
-  <main>
-        
-    <aside>
-  <ul class="menu-curso" id="menu-curso">
-    <li><button type="button" data-seccion="descripción">Descripción</button></li>
-    <li><button type="button" data-seccion="funcionamiento">Funcionamiento</button></li>
-    <li><button type="button" data-seccion="objetivos">Objetivos</button></li>
-    <li><button type="button" data-seccion="cursos">Cursos actuales</button></li>
-    <li><button type="button" data-seccion="contacto">Contacto</button></li>
-  </ul>
-</aside>
-
-    <section>
-      <h1>Cursos más populares</h1>
-        <div class="cursos-grid">
-          <div class="curso">
-            <div class="curso-info">
-              <h3>Creación de personalidades a los personajes</h3>
-              <p>Géneros: Todos narrativa</p>
+    <section class="flex-1">
+      <h2 class="text-3xl font-bold text-center mb-8"> Cursos más populares</h2>
+        <div class="cursos-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">          
+          <div class="curso flex justify-between items-center gap-4 p-4 bg-white/60 rounded-xl border border-[#B76E79]/20 ...">            <div class="curso-info">
+              <h3 class="text-2xl font-semibold text-[#2E1F27]">Creación de personalidades a los personajes</h3>              
+                <p>Géneros: Todos narrativa</p>
             </div>
-      <input type="checkbox" id="apuntar-1" class="toggle">
-      <label for="apuntar-1" class="badge btn-apuntar"></label>    </div>
+            <input type="checkbox" id="apuntar-1" class="toggle">
+            <label for="apuntar-1" class="badge btn-apuntar"></label>    
+          </div>
 
-        <div class="curso">
-          <div class="curso-info">
-              <h3>¿Cómo usar sinónimos?</h3>
-              <p>Géneros: Todos</p>
-        </div>
-        
-      <input type="checkbox" id="apuntar-2" class="toggle">
-      <label for="apuntar-2" class="badge btn-apuntar"></label>    </div>
-      <div class="curso">
-          <div class="curso-info">
-              <h3>Construcción de mundos</h3>
-              <p>Géneros: Fantasía y Ciencia-Ficción</p>
-        </div>
-        
-      <input type="checkbox" id="apuntar-3" class="toggle">
-      <label for="apuntar-3" class="badge btn-apuntar"></label>    </div>    
+          <div class="curso flex justify-between items-center gap-4 p-4 bg-white/60 rounded-xl border border-[#B76E79]/20 hover:-translate-y-1 hover:shadow-lg transition">
+            <div class="curso-info">
+              <h3 class="text-2xl font-semibold text-[#2E1F27]">¿Cómo usar sinónimos?</h3>  
+                <p>Géneros: Todos</p>
+            </div>
+            <input type="checkbox" id="apuntar-2" class="toggle">
+            <label for="apuntar-2" class="badge btn-apuntar"></label>    
+          </div>
+
+          <div class="curso flex justify-between items-center gap-4 p-4 bg-white/60 rounded-xl border border-[#B76E79]/20 hover:-translate-y-1 hover:shadow-lg transition">
+            <div class="curso-info">
+              <h3 class="text-2xl font-semibold text-[#2E1F27]">Construcción de mundos</h3>  
+                <p>Géneros: Fantasía y Ciencia-Ficción</p>
+            </div>
+            <input type="checkbox" id="apuntar-3" class="toggle">
+            <label for="apuntar-3" class="badge btn-apuntar"></label>    
+          </div>    
     
-        </div>
-
-        
+        </div>  
     </section>
 
     
 
   </main>
 
-  <section id="comentarios">
-  <h2>Crea con estas ideas</h2>
+  <section id="comentarios" class="mt-12 p-6 bg-white/60 border border-[#B76E79]/20 rounded-2xl">
+    <h2>Crea con estas ideas</h2>
 
-<input id="idea-search" type="text" placeholder="Buscar ideas..." autocomplete="off">
+    <input
+      id="idea-search"
+      type="text"
+      placeholder="Buscar ideas..."
+      autocomplete="off"
+      class="w-full max-w-xl px-3 py-2 rounded-xl border border-black/15 bg-white outline-none mt-3 mb-3
+            focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/20 transition"
+    >
+      <form id="idea-form">
+        <input id="idea-input" type="text" placeholder="Escribe una idea..." autocomplete="off">
+        <button type="submit">Añadir</button>
+      </form>
 
-  <form id="idea-form">
-    <input id="idea-input" type="text" placeholder="Escribe una idea..." autocomplete="off">
-    <button type="submit">Añadir</button>
-  </form>
-
-  <ul id="idea-list">
-    <li>Un pueblo donde nadie puede mentir</li>
-    <li>Una biblioteca que reescribe finales</li>
-    <li>Un villano que cree ser el héroe</li>
-    <li>Una escritora que cae dentro de su historia y sus personajes le recriminan</li>
-    <li>Un reino que aparece y desaparece del mar</li>
-  </ul>
-  
-  
-  
-</section>
+    <ul id="idea-list" class="grid grid-cols-1 md:grid-cols-3 gap-4 list-none p-0 mt-2"></ul>  
+  </section>
 </body>
 </html>
