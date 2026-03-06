@@ -44,7 +44,7 @@ h2 {
 }
 
 /* Header */
-.header-principal{
+.header-principal {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -55,21 +55,22 @@ h2 {
   text-align: center;
 }
 
-.tagline{
+.tagline {
   margin: 0;
   font-size: 16px;
   opacity: 0.75;
 }
 
-.logo{
+.logo {
   margin: 0;
   font-family: var(--fuente-titulo);
   font-size: 34px;
   color: var(--color-acento);
   letter-spacing: 2px;
 }
+
 /* Nav */
-.header-principal nav{
+.header-principal nav {
   position: absolute;
   right: 40px;
   top: 35px;
@@ -77,14 +78,15 @@ h2 {
   gap: 18px;
 }
 
-.header-principal nav a{
+.header-principal nav a {
   color: var(--color-acento);
   text-decoration: none;
   transition: opacity 0.2s ease;
-  margin-left: 0; /* quitamos el margin-left anterior */
+  margin-left: 0;
+  /* quitamos el margin-left anterior */
 }
 
-.header-principal nav a:hover{
+.header-principal nav a:hover {
   opacity: 0.65;
 }
 
@@ -115,15 +117,16 @@ section {
   padding: var(--spacing-medium);
   /*background-color: #FFFFFF;*/
   border-radius: 14px;
-  border: 1px solid rgba(183,110,121,0.18);
+  border: 1px solid rgba(183, 110, 121, 0.18);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.curso:hover{
+
+.curso:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 26px rgba(0,0,0,0.08);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.08);
 }
 
-.menu-curso{
+.menu-curso {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -131,36 +134,36 @@ section {
   gap: 8px;
 }
 
-.menu-curso button{
+.menu-curso button {
   width: 100%;
   text-align: left;
   padding: 10px 12px;
   border-radius: 12px;
-  border: 1px solid rgba(183,110,121,0.18);
-  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(183, 110, 121, 0.18);
+  background: rgba(255, 255, 255, 0.55);
   cursor: pointer;
   font: inherit;
 }
 
-.menu-curso button:hover{
-    transform: translateX(3px);
-  background: rgba(183,110,121,0.10);
+.menu-curso button:hover {
+  transform: translateX(3px);
+  background: rgba(183, 110, 121, 0.10);
 }
 
-.menu-curso button.activo{
-  background: rgba(183,110,121,0.18);
-  border-color: rgba(183,110,121,0.35);
+.menu-curso button.activo {
+  background: rgba(183, 110, 121, 0.18);
+  border-color: rgba(183, 110, 121, 0.35);
 }
 
-.panel-curso{
+.panel-curso {
   margin-top: 18px;
   padding: 16px;
   border-radius: 16px;
-  background: rgba(255,255,255,0.55);
-  border: 1px solid rgba(183,110,121,0.18);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(183, 110, 121, 0.18);
 }
 
-.panel-curso h2{
+.panel-curso h2 {
   margin: 0 0 8px;
 }
 
@@ -173,8 +176,13 @@ section {
   color: whitesmoke;
 }
 
-.abierto { background-color: var(--color-verde); }
-.cerrado { background-color: var(--color-rojo); }
+.abierto {
+  background-color: var(--color-verde);
+}
+
+.cerrado {
+  background-color: var(--color-rojo);
+}
 
 /* Ocultar checkbox */
 .toggle {
@@ -194,71 +202,79 @@ section {
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.btn-apuntar::before { content: "Apuntar"; }
+.btn-apuntar::before {
+  content: "Apuntar";
+}
 
-.toggle:checked + .btn-apuntar {
+.toggle:checked+.btn-apuntar {
   background: var(--color-verde);
 }
-.toggle:checked + .btn-apuntar::before { content: "Apuntado"; }
 
-.btn-apuntar:active { transform: scale(0.98); }
+.toggle:checked+.btn-apuntar::before {
+  content: "Apuntado";
+}
+
+.btn-apuntar:active {
+  transform: scale(0.98);
+}
 
 /* SECCIÓN IDEAS */
 
-#comentarios{
+#comentarios {
   margin-top: 48px;
   padding: 24px;
-  background: rgba(255,255,255,0.55);
-  border: 1px solid rgba(183,110,121,0.18);
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(183, 110, 121, 0.18);
   border-radius: 18px;
 }
 
 /* Buscador */
-#idea-search{
+#idea-search {
   width: 100%;
   max-width: 520px;
   padding: 10px 12px;
   border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.15);
+  border: 1px solid rgba(0, 0, 0, 0.15);
   background: white;
   font: inherit;
   outline: none;
   margin: 10px 0 12px;
 }
 
-#idea-search:focus{
+#idea-search:focus {
   border-color: var(--color-acento);
-  box-shadow: 0 0 0 3px rgba(183,110,121,0.12);
+  box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.12);
 }
 
-#idea-form{
+#idea-form {
   position: relative;
-  width: 520px;         
-  max-width: 100%;     
+  width: 520px;
+  max-width: 100%;
   margin: 12px 0 18px;
 }
 
-#idea-input{
+#idea-input {
   width: 100%;
-  box-sizing: border-box;             
-  padding: 10px 120px 10px 14px;     
+  box-sizing: border-box;
+  padding: 10px 120px 10px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(0,0,0,0.15);
+  border: 1px solid rgba(0, 0, 0, 0.15);
   background: white;
   font: inherit;
   outline: none;
 }
 
 
-#idea-input:focus{
+#idea-input:focus {
   border-color: var(--color-acento);
-  box-shadow: 0 0 0 3px rgba(183,110,121,0.12);
+  box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.12);
 }
 
 /* Botón "Añadir" dentro del input (derecha) */
-#idea-form button{
+#idea-form button {
   position: absolute;
-  right: 8px;                          /* pegado a la derecha */
+  right: 8px;
+  /* pegado a la derecha */
   top: 50%;
   transform: translateY(-50%);
   padding: 8px 16px;
@@ -272,12 +288,16 @@ section {
   transition: opacity 0.15s ease;
 }
 
-#idea-form button:hover{ opacity: 0.9; }
+#idea-form button:hover {
+  opacity: 0.9;
+}
 
-#idea-form button:active{ opacity: 0.85; }
+#idea-form button:active {
+  opacity: 0.85;
+}
 
 /* Grid de tarjetas */
-#idea-list{
+#idea-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
@@ -287,12 +307,12 @@ section {
 }
 
 /* Tarjeta */
-#idea-list li{
+#idea-list li {
   background: white;
   padding: 18px;
   border-radius: 14px;
-  border: 1px solid rgba(0,0,0,0.08);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -302,13 +322,13 @@ section {
   min-height: 110px;
 }
 
-#idea-list li:hover{
+#idea-list li:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 28px rgba(0,0,0,0.08);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08);
 }
 
 /* Botón papelera (solo para ideas de usuario) */
-#idea-list li button{
+#idea-list li button {
   align-self: flex-end;
   background: transparent;
   border: none;
@@ -316,18 +336,18 @@ section {
   font-size: 18px;
   padding: 6px;
   border-radius: 10px;
-  opacity: 0.35; 
+  opacity: 0.35;
   transition: opacity 0.2s ease, background 0.2s ease;
 }
 
 
-#idea-list li button:hover{
+#idea-list li button:hover {
   opacity: 1;
-  background: rgba(183,110,121,0.12);
+  background: rgba(183, 110, 121, 0.12);
 }
 
 /* Badge Profesora */
-.badge-profe{
+.badge-profe {
   align-self: flex-start;
   font-size: 12px;
   padding: 4px 10px;
@@ -339,39 +359,41 @@ section {
 }
 
 /*Marcar tarjetas de profes */
-.idea-profesor{
+.idea-profesor {
   border-left: 4px solid var(--color-acento);
 }
 
 /* Animación aparición de tarjetas */
-#idea-list li{
+#idea-list li {
   animation: aparecer 0.25s ease;
 }
 
-@keyframes aparecer{
-  from{
+@keyframes aparecer {
+  from {
     opacity: 0;
     transform: translateY(8px);
   }
-  to{
+
+  to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
 /* Animación al borrar tarjeta */
-.borrando{
+.borrando {
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
-@keyframes borrarIdea{
-  from{
+@keyframes borrarIdea {
+  from {
     opacity: 1;
     transform: translateY(0);
   }
-  to{
+
+  to {
     opacity: 0;
     transform: translateY(8px);
   }
@@ -381,9 +403,9 @@ section {
 
 @media (max-width: 768px) {
 
-.logo{
-  font-size: 28px;
-}
+  .logo {
+    font-size: 28px;
+  }
 
   header {
     flex-direction: column;
@@ -392,11 +414,11 @@ section {
     padding: 0 var(--spacing-medium) var(--spacing-medium);
   }
 
-  .header-principal{
-  align-items: center;
-}
+  .header-principal {
+    align-items: center;
+  }
 
- /* .header-principal nav{
+  /* .header-principal nav{
   position: static;
   margin-top: 10px;
   justify-content: center;
@@ -424,11 +446,11 @@ section {
     line-height: 1.1;
   }
 
- .cursos-grid{
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
+  .cursos-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 
   .curso {
     flex-direction: column;
@@ -436,11 +458,12 @@ section {
     gap: var(--spacing-small);
   }
 
-  #idea-list{
+  #idea-list {
     grid-template-columns: 1fr;
   }
 
-  #idea-form, #idea-search{
+  #idea-form,
+  #idea-search {
     max-width: 100%;
   }
 }
