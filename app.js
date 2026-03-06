@@ -1,6 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("JS cargado");
-
   const form = document.querySelector("#idea-form");
   const input = document.querySelector("#idea-input");
   const list = document.querySelector("#idea-list");
@@ -15,13 +13,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /*Preferncia guardada*/
   const savedTheme = localStorage.getItem("theme");
-  if (savedTheme === "dark") {
-    root.classList.add("dark");
-    toggleBtn.textContent = "☀️";
-  } else {
-    root.classList.remove("dark");
-    toggleBtn.textContent = "🌙";
-  }
+  activeSelectedMode(savedTheme);
+
+  function activeSelectedMode(style){
+    root.classList.add(style);
+    toggleBtn.textContent = savedTheme === "dark" ? "☀️":"🌙";
+  };  
 
   /*Alternancia estilo*/
   toggleBtn.addEventListener("click", () => {
@@ -44,6 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function pintarIdeaEnDOM(texto, fija = false) {
     const li = document.createElement("li");
     li.className = "bg-white p-4 rounded-xl border border-black/10 shadow-sm hover:-translate-y-1 hover:shadow-md transition";
+    
     if (fija) li.classList.add("idea-profesor");
 
     if (fija) {
@@ -124,8 +122,6 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
-
-
 
   menuCurso.addEventListener("click", (e) => {
     const btn = e.target.closest("button");
