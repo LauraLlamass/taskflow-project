@@ -1,0 +1,1 @@
+En este documento se incluye una reflexión sobre el uso de IA analizando ventajas, limitaciones y aprendizajes durante el proyecto de TaskFlow.

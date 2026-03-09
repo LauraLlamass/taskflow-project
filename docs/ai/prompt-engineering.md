@@ -1,0 +1,1 @@
+En este documento se explica la mejor forma para que herramientas de IA entreguen mejores respuestas y qué tipos de prompts funcionan mejor durante el desarrollo de TaskFlow.
