@@ -4,6 +4,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const list = document.querySelector("#task-list");
   const search = document.querySelector("#task-search");
   const clearBtn = document.querySelector("#tasks-clear");
+  const clearCompletedBtn = document.querySelector("#clear-completed");
+  const completeAllBtn = document.querySelector("#complete-all");
+  const emptyMessage = document.querySelector("#empty-message");
+
+  const progressText = document.querySelector("#progress-text");
+  const progressBar = document.querySelector("#progress-bar");
 
   const totalEl = document.querySelector("#stats-total");
   const completedEl = document.querySelector("#stats-completed");
@@ -11,6 +17,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const toggleBtn = document.querySelector("#theme-toggle");
   const root = document.documentElement;
+
+  const filterAllBtn = document.querySelector("#filter-all");
+  const filterPendingBtn = document.querySelector("#filter-pending");
+  const filterCompletedBtn = document.querySelector("#filter-completed");
 
   const savedTheme = localStorage.getItem("theme");
   applyTheme(savedTheme);
@@ -33,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   let tasks = [];
-
+  let currentFilter = "all";
   /**
    * Guarda las tareas en localStorage.
    */
@@ -84,8 +94,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
-   * Actualiza el panel de estadísticas.
-   */
+ * Actualiza el panel de estadísticas y la barra de progreso.
+ */
   function updateStats() {
     const total = tasks.length;
     const completed = tasks.filter((task) => task.completed).length;
@@ -94,6 +104,23 @@ document.addEventListener("DOMContentLoaded", () => {
     totalEl.textContent = total;
     completedEl.textContent = completed;
     pendingEl.textContent = pending;
+
+    if (progressText) {
+      progressText.textContent = `${completed} / ${total} tareas completadas`;
+    }
+
+    if (progressBar) {
+      const percentage = total === 0 ? 0 : (completed / total) * 100;
+      progressBar.style.width = `${percentage}%`;
+
+      if (percentage === 100) {
+        progressBar.classList.remove("bg-[#B76E79]");
+        progressBar.classList.add("bg-green-500");
+      } else {
+        progressBar.classList.remove("bg-green-500");
+        progressBar.classList.add("bg-[#B76E79]");
+      }
+    }
   }
 
   /**
@@ -128,6 +155,20 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /**
+   * Marca todas las tareas como completadas.
+   */
+  function completeAllTasks() {
+    tasks = tasks.map((task) => ({
+      ...task,
+      completed: true
+    }));
+
+    saveTasks();
+    renderTasks(search.value.toLowerCase());
+    updateStats();
+  }
+
+  /**
    * Crea el texto visible de una tarea.
    * @param {string} title
    * @param {boolean} completed
@@ -140,6 +181,12 @@ document.addEventListener("DOMContentLoaded", () => {
       ? "text-[#2E1F27] dark:text-slate-200 line-through opacity-60"
       : "text-[#2E1F27] dark:text-slate-200";
     return span;
+  }
+
+  if (tasks.length === 0) {
+    emptyMessage.style.display = "block";
+  } else {
+    emptyMessage.style.display = "none";
   }
 
   /**
@@ -197,13 +244,20 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderTasks(query = "") {
     list.innerHTML = "";
 
-    const filteredTasks = tasks.filter((task) =>
+    let filteredTasks = tasks.filter((task) =>
       task.title.toLowerCase().includes(query)
     );
 
+    if (currentFilter === "pending") {
+      filteredTasks = filteredTasks.filter((task) => !task.completed);
+    }
+
+    if (currentFilter === "completed") {
+      filteredTasks = filteredTasks.filter((task) => task.completed);
+    }
+
     filteredTasks.forEach((task) => renderTaskInDOM(task));
   }
-
   /**
    * Elimina todas las tareas.
    * @returns {boolean}
@@ -217,6 +271,16 @@ document.addEventListener("DOMContentLoaded", () => {
       console.warn("No se pudieron eliminar las tareas:", err);
       return false;
     }
+  }
+
+  /**
+ * Elimina todas las tareas completadas.
+ */
+  function clearCompletedTasks() {
+    tasks = tasks.filter((task) => !task.completed);
+    saveTasks();
+    renderTasks(search.value.toLowerCase());
+    updateStats();
   }
 
   loadTasks();
@@ -260,4 +324,39 @@ document.addEventListener("DOMContentLoaded", () => {
       input.focus();
     });
   }
+  if (filterAllBtn) {
+    filterAllBtn.addEventListener("click", () => {
+      currentFilter = "all";
+      renderTasks(search.value.toLowerCase());
+    });
+  }
+
+  if (filterPendingBtn) {
+    filterPendingBtn.addEventListener("click", () => {
+      currentFilter = "pending";
+      renderTasks(search.value.toLowerCase());
+    });
+  }
+
+  if (filterCompletedBtn) {
+    filterCompletedBtn.addEventListener("click", () => {
+      currentFilter = "completed";
+      renderTasks(search.value.toLowerCase());
+    });
+  }
+
+  if (clearCompletedBtn) {
+    clearCompletedBtn.addEventListener("click", () => {
+      const ok = window.confirm("¿Seguro que quieres borrar todas las tareas completadas?");
+      if (!ok) return;
+      clearCompletedTasks();
+    });
+  }
+
+  if (completeAllBtn) {
+    completeAllBtn.addEventListener("click", () => {
+      completeAllTasks();
+    });
+  }
+
 });
