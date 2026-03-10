@@ -4,133 +4,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cursos de escritura</title>
+  <title>TaskFlow - Escritura de novelas</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script> tailwind.config = { darkMode: 'class' }</script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
   <link rel="stylesheet" href="styles.css" />
   <script src="app.js" defer></script>
 </head>
 
 <body class="bg-[#FAF5F8] text-[#2E1F27] p-4 font-serif dark:bg-slate-900 dark:text-slate-100">
   <header class="relative w-full flex flex-col items-center gap-2 mb-8 pb-4 border-b-2 border-[#B76E79] text-center">
-    <h1 class="logo text-3xl md:text-4xl tracking-wider text-[#B76E79] font-bold font-serif m-0">Escritura creativa
+    <h1 class="logo text-3xl md:text-4xl tracking-wider text-[#B76E79] font-bold font-serif m-0">
+      Tareas para escribir tu libro
     </h1>
-    <p class="tagline text-sm opacity-75 m-0">Cursos cortos para escribir con estilo y confianza</p>
-
+    <p class="tagline text-sm opacity-75 m-0">
+      Organiza personajes, escaleta, capítulos y revisiones
+    </p>
   </header>
 
   <button id="theme-toggle" type="button"
-    class="fixed top-4 right-4 rounded-full px-4 py-2 bg-[#B76E79] text-white shadow-md hover:opacity-90 transition">🌙</button>
+    class="fixed top-4 right-4 rounded-full px-4 py-2 bg-[#B76E79] text-white shadow-md hover:opacity-90 transition">
+    🌙
+  </button>
 
-  <main class="flex flex-col md:flex-row gap-8 mt-8 items-start">
-    <aside class="w-full md:w-64">
-      <ul class="menu-curso list-none p-0 m-0 grid gap-2" id="menu-curso">
-        <li>
-          <button type="button" data-seccion="descripcion"
-            class="w-full text-left px-3 py-2 rounded-xl border border-[#B76E79]/20 bg-white/60 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-            Descripción
-          </button>
-        </li>
-
-        <li>
-          <button type="button" data-seccion="funcionamiento"
-            class="w-full text-left px-3 py-2 rounded-xl border border-[#B76E79]/20 bg-white/60 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-            Funcionamiento
-          </button>
-        </li>
-
-        <li>
-          <button type="button" data-seccion="objetivos"
-            class="w-full text-left px-3 py-2 rounded-xl border border-[#B76E79]/20 bg-white/60 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-            Objetivos
-          </button>
-        </li>
-
-        <li>
-          <button type="button" data-seccion="cursos"
-            class="w-full text-left px-3 py-2 rounded-xl border border-[#B76E79]/20 bg-white/60 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-            Cursos actuales
-          </button>
-        </li>
-
-        <li>
-          <button type="button" data-seccion="contacto"
-            class="w-full text-left px-3 py-2 rounded-xl border border-[#B76E79]/20 bg-white/60 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-            Contacto
-          </button>
-        </li>
-      </ul>
-    </aside>
-
+  <main class="flex flex-col lg:flex-row gap-8 mt-8 items-start">
     <section class="flex-1">
-      <h2 class="text-3xl font-bold text-center mb-8"> Cursos más populares</h2>
-      <div id="bloque-cursos" class="cursos-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div
-          class="curso flex justify-between items-center gap-4 p-4 bg-white/60 rounded-xl border border-[#B76E79]/20 hover:-translate-y-1 hover:shadow-lg transition">
-          <div class="curso-info">
-            <h3 class="text-2xl font-semibold text-[#2E1F27]">Creación de personalidades a los personajes</h3>
-            <p>Géneros: Todos narrativa</p>
-          </div>
-          <input type="checkbox" id="apuntar-1" class="toggle">
-          <label for="apuntar-1" class="badge btn-apuntar">
-            <span class="btn-apuntar-off">Apuntar</span>
-            <span class="btn-apuntar-on">Apuntado</span>
-          </label>
-        </div>
+      <h2 class="text-3xl font-bold text-center mb-8">Tareas de escritura</h2>
 
-        <div
-          class="curso flex justify-between items-center gap-4 p-4 bg-white/60 rounded-xl border border-[#B76E79]/20 hover:-translate-y-1 hover:shadow-lg transition">
-          <div class="curso-info">
-            <h3 class="text-2xl font-semibold text-[#2E1F27]">¿Cómo usar sinónimos?</h3>
-            <p>Géneros: Todos</p>
-          </div>
-          <input type="checkbox" id="apuntar-2" class="toggle">
-          <label for="apuntar-2" class="badge btn-apuntar">
-            <span class="btn-apuntar-off">Apuntar</span>
-            <span class="btn-apuntar-on">Apuntado</span>
-          </label>
-        </div>
-
-        <div
-          class="curso flex justify-between items-center gap-4 p-4 bg-white/60 rounded-xl border border-[#B76E79]/20 hover:-translate-y-1 hover:shadow-lg transition">
-          <div class="curso-info">
-            <h3 class="text-2xl font-semibold text-[#2E1F27]">Construcción de mundos</h3>
-            <p>Géneros: Fantasía y Ciencia-Ficción</p>
-          </div>
-          <input type="checkbox" id="apuntar-3" class="toggle">
-          <label for="apuntar-3" class="badge btn-apuntar">
-            <span class="btn-apuntar-off">Apuntar</span>
-            <span class="btn-apuntar-on">Apuntado</span>
-          </label>
-        </div>
+      <div class="mb-6 p-6 bg-white/60 border border-[#B76E79]/20 rounded-2xl">
+        <label for="task-search" class="block mb-2 font-semibold">Buscar tareas</label>
+        <input id="task-search" type="text" placeholder="Buscar tarea..." autocomplete="off"
+          class="w-full px-3 py-2 rounded-xl border border-black/15 bg-white dark:bg-slate-900 dark:text-white dark:border-slate-700 outline-none transition focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/20">
       </div>
+
+      <div class="mb-6 p-6 bg-white/60 border border-[#B76E79]/20 rounded-2xl">
+        <h2 class="text-2xl font-bold mb-4">Añadir tarea</h2>
+
+        <form id="task-form" class="flex flex-col md:flex-row items-start md:items-end gap-3">
+          <div class="flex-1 w-full">
+            <label for="task-input" class="block mb-2 font-semibold">Nueva tarea</label>
+            <input id="task-input" type="text" placeholder="Ej. Crear ficha del protagonista" autocomplete="off"
+              class="w-full px-3 py-2 rounded-xl border border-black/15 bg-white dark:bg-slate-900 dark:text-white dark:border-slate-700 outline-none transition focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/20" />
+          </div>
+
+          <button type="submit"
+            class="whitespace-nowrap rounded-xl px-4 py-2 bg-[#B76E79] text-white hover:opacity-90 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
+            Añadir tarea
+          </button>
+        </form>
+      </div>
+
+      <ul id="task-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 list-none p-0 mt-2"></ul>
+
+      <button id="tasks-clear" type="button"
+        class="mt-4 rounded-full px-4 py-2 bg-white text-[#2E1F27] border border-[#B76E79]/40 shadow-sm hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
+        Borrar todas las tareas
+      </button>
     </section>
 
+    <aside
+      class="w-full lg:w-80 p-6 bg-white/60 dark:bg-white/60 border border-[#B76E79]/20 dark:border-slate-700 rounded-2xl">
+      <h2 class="text-2xl font-bold mb-4">Estadísticas</h2>
 
+      <div class="grid gap-3">
+        <div class="rounded-xl bg-white dark:bg-slate-800 p-4 border border-black/10 dark:border-slate-700 shadow-sm">
+          <p class="text-sm opacity-70 dark:text-slate-300">Total</p>
+          <p id="stats-total" class="text-2xl font-bold text-[#2E1F27] dark:text-white">0</p>
+        </div>
 
+        <div class="rounded-xl bg-white dark:bg-slate-800 p-4 border border-black/10 dark:border-slate-700 shadow-sm">
+          <p class="text-sm opacity-70 dark:text-slate-300">Completadas</p>
+          <p id="stats-completed" class="text-2xl font-bold text-[#2E1F27] dark:text-white">0</p>
+        </div>
+
+        <div class="rounded-xl bg-white dark:bg-slate-800 p-4 border border-black/10 dark:border-slate-700 shadow-sm">
+          <p class="text-sm opacity-70 dark:text-slate-300">Pendientes</p>
+          <p id="stats-pending" class="text-2xl font-bold text-[#2E1F27] dark:text-white">0</p>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <h3 class="text-xl font-semibold mb-3">Ejemplos de tareas</h3>
+        <ul class="list-disc pl-5 space-y-2 text-sm opacity-80">
+          <li>Crear ficha del protagonista</li>
+          <li>Definir el conflicto principal</li>
+          <li>Escribir la escaleta del capítulo 1</li>
+          <li>Revisar los diálogos</li>
+        </ul>
+      </div>
+    </aside>
   </main>
-
-  <section id="comentarios" class="mt-12 p-6 bg-white/60 border border-[#B76E79]/20 rounded-2xl">
-    <h2>Crea con estas ideas</h2>
-
-    <input id="idea-search" type="text" placeholder="Buscar ideas..." autocomplete="off"
-      class="w-full max-w-xl px-3 py-2 rounded-xl border border-black/15 bg-white outline-none mt-3 mb-3 focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/20 transition">
-    <form id="idea-form" class="flex items-center gap-2 max-w-xl">
-      <input id="idea-input" type="text" placeholder="Escribe una idea..." autocomplete="off"
-        class="flex-1 px-3 py-2 rounded-xl border border-black/15 bg-white outline-none transition focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/20" />
-      <button type="submit"
-        class="whitespace-nowrap rounded-xl px-4 py-2 bg-[#B76E79] text-white hover:opacity-90 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-        Añadir idea
-      </button>
-    </form>
-
-    <ul id="idea-list" class="grid grid-cols-1 md:grid-cols-3 gap-4 list-none p-0 mt-2"></ul>
-
-    <button id="ideas-clear" type="button"
-      class="mt-4 rounded-full px-4 py-2 bg-white text-[#2E1F27] border border-[#B76E79]/40 shadow-sm hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-      Borrar todo
-    </button>
-  </section>
 </body>
 
 </html>

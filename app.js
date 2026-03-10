@@ -1,211 +1,263 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.querySelector("#idea-form");
-  const input = document.querySelector("#idea-input");
-  const list = document.querySelector("#idea-list");
-  const search = document.querySelector("#idea-search");
-  const clearBtn = document.querySelector("#ideas-clear");
-  const ideasProfes = [
-    "Un pueblo donde nadie puede mentir",
-    "Una biblioteca que reescribe finales",
-    "Una escritora que cae dentro de su historia y sus personajes le recriminan",
-  ];
+  const form = document.querySelector("#task-form");
+  const input = document.querySelector("#task-input");
+  const list = document.querySelector("#task-list");
+  const search = document.querySelector("#task-search");
+  const clearBtn = document.querySelector("#tasks-clear");
+
+  const totalEl = document.querySelector("#stats-total");
+  const completedEl = document.querySelector("#stats-completed");
+  const pendingEl = document.querySelector("#stats-pending");
+
   const toggleBtn = document.querySelector("#theme-toggle");
   const root = document.documentElement;
 
-  /*Preferncia guardada*/
   const savedTheme = localStorage.getItem("theme");
   applyTheme(savedTheme);
 
+  /**
+   * Aplica el tema guardado a la aplicación.
+   * @param {string | null} style
+   */
   function applyTheme(style) {
-    root.classList.add(style);
-    toggleBtn.textContent = savedTheme === "dark" ? "☀️" : "🌙";
-  };
+    if (style) {
+      root.classList.add(style);
+    }
+    toggleBtn.textContent = style === "dark" ? "☀️" : "🌙";
+  }
 
-  /*Alternancia estilo*/
   toggleBtn.addEventListener("click", () => {
     const isDark = root.classList.toggle("dark");
     localStorage.setItem("theme", isDark ? "dark" : "light");
     toggleBtn.textContent = isDark ? "☀️" : "🌙";
   });
 
-  let ideas = [];
+  let tasks = [];
 
-  function guardarIdeas() {
-    // Guarda las ideas del usuario en `localStorage` (persisten al recargar la página).
-    try {
-      const safeIdeas = Array.isArray(ideas) ? ideas.filter((v) => typeof v === "string") : [];
-      localStorage.setItem("ideas", JSON.stringify(safeIdeas));
-    } catch (err) {
-      // Si `localStorage` no está disponible o está lleno, evitamos romper la app.
-      console.warn("No se pudieron guardar las ideas en localStorage:", err);
-    }
-  }
-
-  function eliminarTodasLasIdeasGuardadas() {
-    // Elimina todas las ideas guardadas en `localStorage` (clave: "ideas").
-    try {
-      localStorage.removeItem("ideas");
-      ideas = [];
-      return true;
-    } catch (err) {
-      console.warn("No se pudieron eliminar las ideas de localStorage:", err);
-      return false;
-    }
-  }
-
-  function cargarIdeas() {
-    const data = localStorage.getItem("ideas");
-    ideas = data ? JSON.parse(data) : [];
-  }
-
-  function limpiarIdeasDeUsuarioDelDOM() {
-    list.querySelectorAll("li:not(.idea-profesor)").forEach((li) => li.remove());
-  }
   /**
-   * Valida el texto introducido para una nueva idea.
+   * Guarda las tareas en localStorage.
+   */
+  function saveTasks() {
+    try {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    } catch (err) {
+      console.warn("No se pudieron guardar las tareas:", err);
+    }
+  }
+
+  /**
+   * Carga las tareas desde localStorage.
+   */
+  function loadTasks() {
+    try {
+      const data = localStorage.getItem("tasks");
+      tasks = data ? JSON.parse(data) : [];
+    } catch (err) {
+      console.warn("No se pudieron cargar las tareas:", err);
+      tasks = [];
+    }
+  }
+
+  /**
+   * Valida el título de una nueva tarea.
    * Comprueba que no esté vacío y que no esté duplicado.
-   * @param {string} texto
+   * @param {string} title
    * @returns {boolean}
    */
-  function validarIdea(texto) {
-    if (texto === "") return false;
-    if (ideas.includes(texto)) return false;
-    return true;
+  function validateTask(title) {
+    if (title === "") return false;
+    return !tasks.some((task) => task.title.toLowerCase() === title.toLowerCase());
   }
 
   /**
- * Crea el elemento de texto para mostrar una idea en la lista.
- * @param {string} texto
- * @returns {HTMLSpanElement}
- */
-  function crearTextoIdea(texto) {
-    const span = document.createElement("span");
-    span.textContent = texto;
-    span.classList.add("text-[#2E1F27]");
-    return span;
+   * Crea un nuevo objeto tarea.
+   * @param {string} title
+   * @returns {{id: number, title: string, completed: boolean, createdAt: string}}
+   */
+  function createTask(title) {
+    return {
+      id: Date.now(),
+      title,
+      completed: false,
+      createdAt: new Date().toISOString(),
+    };
   }
 
-  function eliminarIdea(texto, li) {
+  /**
+   * Actualiza el panel de estadísticas.
+   */
+  function updateStats() {
+    const total = tasks.length;
+    const completed = tasks.filter((task) => task.completed).length;
+    const pending = total - completed;
+
+    totalEl.textContent = total;
+    completedEl.textContent = completed;
+    pendingEl.textContent = pending;
+  }
+
+  /**
+   * Elimina una tarea del array y del DOM.
+   * @param {number} id
+   * @param {HTMLLIElement} li
+   */
+  function deleteTask(id, li) {
     li.classList.add("borrando");
 
     setTimeout(() => {
-      ideas = ideas.filter((idea) => idea !== texto);
-      guardarIdeas();
+      tasks = tasks.filter((task) => task.id !== id);
+      saveTasks();
+      updateStats();
       li.remove();
     }, 250);
   }
 
-  function pintarIdeaEnDOM(texto, fija = false) {
+  /**
+   * Cambia el estado completed de una tarea.
+   * @param {number} id
+   * @param {boolean} checked
+   */
+  function toggleTaskCompleted(id, checked) {
+    tasks = tasks.map((task) =>
+      task.id === id ? { ...task, completed: checked } : task
+    );
+
+    saveTasks();
+    updateStats();
+    renderTasks(search.value.toLowerCase());
+  }
+
+  /**
+   * Crea el texto visible de una tarea.
+   * @param {string} title
+   * @param {boolean} completed
+   * @returns {HTMLSpanElement}
+   */
+  function createTaskText(title, completed) {
+    const span = document.createElement("span");
+    span.textContent = title;
+    span.className = completed
+      ? "text-[#2E1F27] dark:text-slate-200 line-through opacity-60"
+      : "text-[#2E1F27] dark:text-slate-200";
+    return span;
+  }
+
+  /**
+   * Renderiza una tarea en el DOM.
+   * @param {{id: number, title: string, completed: boolean, createdAt: string}} task
+   */
+  function renderTaskInDOM(task) {
     const li = document.createElement("li");
-    li.className = "bg-white p-4 rounded-xl border border-black/10 shadow-sm hover:-translate-y-1 hover:shadow-md transition";
+    li.className =
+      "bg-white p-4 rounded-xl border border-black/10 shadow-sm hover:-translate-y-1 hover:shadow-md transition flex flex-col gap-3 dark:bg-white/60";
 
-    if (fija) li.classList.add("idea-profesor");
+    const topRow = document.createElement("div");
+    topRow.className = "flex items-start gap-3";
 
-    if (fija) {
-      const badge = document.createElement("span");
-      badge.textContent = "Profesoras";
-      badge.className = "inline-block self-start text-xs px-3 py-1 rounded-full bg-[#B76E79] text-white mb-2";
-      li.appendChild(badge);
-    }
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = task.completed;
+    checkbox.className = "mt-1 h-4 w-4 accent-[#B76E79]";
+    checkbox.setAttribute("aria-label", `Marcar tarea: ${task.title}`);
 
-    const span = crearTextoIdea(texto);
-    li.appendChild(span);
+    checkbox.addEventListener("change", () => {
+      toggleTaskCompleted(task.id, checkbox.checked);
+    });
 
-    if (!fija) {
-      const button = document.createElement("button");
-      button.textContent = "🗑️";
-      button.className = "self-end p-2 rounded-lg opacity-60 hover:opacity-100 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]";
+    const text = createTaskText(task.title, task.completed);
 
-      button.addEventListener("click", () => {
-        eliminarIdea(texto, li);
-      });
+    topRow.appendChild(checkbox);
+    topRow.appendChild(text);
 
-      li.appendChild(button);
-    }
+    const meta = document.createElement("p");
+    meta.className = "text-xs opacity-60";
+    meta.textContent = `Creada: ${new Date(task.createdAt).toLocaleDateString("es-ES")}`;
 
-    //orden: profes arriba, usuarios justo debajo (nuevos primero)
-    if (fija) {
-      list.appendChild(li);
-    } else {
-      const primeraUsuario = list.querySelector("li:not(.idea-profesor)");
-      if (primeraUsuario) list.insertBefore(li, primeraUsuario);
-      else list.appendChild(li);
+    const button = document.createElement("button");
+    button.textContent = "🗑️";
+    button.className =
+      "self-end p-2 rounded-lg opacity-60 hover:opacity-100 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]";
+    button.setAttribute("aria-label", `Eliminar tarea: ${task.title}`);
+
+    button.addEventListener("click", () => {
+      deleteTask(task.id, li);
+    });
+
+    li.appendChild(topRow);
+    li.appendChild(meta);
+    li.appendChild(button);
+
+    list.appendChild(li);
+  }
+
+  /**
+   * Renderiza todas las tareas, opcionalmente filtradas por texto.
+   * @param {string} query
+   */
+  function renderTasks(query = "") {
+    list.innerHTML = "";
+
+    const filteredTasks = tasks.filter((task) =>
+      task.title.toLowerCase().includes(query)
+    );
+
+    filteredTasks.forEach((task) => renderTaskInDOM(task));
+  }
+
+  /**
+   * Elimina todas las tareas.
+   * @returns {boolean}
+   */
+  function clearAllTasks() {
+    try {
+      localStorage.removeItem("tasks");
+      tasks = [];
+      return true;
+    } catch (err) {
+      console.warn("No se pudieron eliminar las tareas:", err);
+      return false;
     }
   }
 
-  // iniciar lista
-  list.innerHTML = "";
-  ideasProfes.forEach((idea) => pintarIdeaEnDOM(idea, true));
+  loadTasks();
+  renderTasks();
+  updateStats();
 
-  cargarIdeas();
-  for (let i = ideas.length - 1; i >= 0; i--) {
-    pintarIdeaEnDOM(ideas[i], false);
-  }
-
-  // Submit
   form.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    /**
- * Valida el texto introducido para una nueva idea.
- * Comprueba que no esté vacío y que no esté duplicado.
- * @param {string} texto
- * @returns {boolean}
- */
-    const texto = input.value.trim();
-    if (!validarIdea(texto)) return;
+    const title = input.value.trim();
+    if (!validateTask(title)) return;
 
-    ideas.unshift(texto);
-    guardarIdeas();
-    pintarIdeaEnDOM(texto, false);
+    const newTask = createTask(title);
+    tasks.unshift(newTask);
+
+    saveTasks();
+    renderTasks(search.value.toLowerCase());
+    updateStats();
 
     input.value = "";
     input.focus();
   });
 
-  // Buscador 
   if (search) {
     search.addEventListener("input", () => {
-      const q = search.value.toLowerCase();
-      const items = list.querySelectorAll("li");
-
-      items.forEach((li) => {
-        const texto = li.innerText.toLowerCase();
-        li.style.display = texto.includes(q) ? "" : "none";
-      });
+      renderTasks(search.value.toLowerCase());
     });
   }
 
-  // Borrar todo (solo ideas del usuario)
   if (clearBtn) {
     clearBtn.addEventListener("click", () => {
-      const ok = window.confirm("¿Seguro que quieres borrar todas tus ideas guardadas? Esta acción no se puede deshacer.");
+      const ok = window.confirm(
+        "¿Seguro que quieres borrar todas las tareas? Esta acción no se puede deshacer."
+      );
       if (!ok) return;
-      if (!eliminarTodasLasIdeasGuardadas()) return;
-      limpiarIdeasDeUsuarioDelDOM();
+      if (!clearAllTasks()) return;
+
+      renderTasks();
+      updateStats();
       if (search) search.value = "";
       input.focus();
     });
   }
-
-  menuCurso.addEventListener("click", (e) => {
-    const btn = e.target.closest("button");
-    if (!btn) return;
-
-    const seccion = btn.dataset.seccion;
-    panelTitulo.textContent = contenido[seccion].titulo;
-    panelTexto.textContent = contenido[seccion].texto;
-
-    // marcar activo
-    menuCurso.querySelectorAll("button").forEach(b => b.classList.remove("activo"));
-    btn.classList.add("activo");
-  });
-
-  //crea una funcion que cuente cuantas ideas estan almacenadas actualmente
-  function contarIdeas() {
-    const ideas = localStorage.getItem("ideas");
-    return ideas ? ideas.length : 0;
-  }
-
-
 });
