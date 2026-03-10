@@ -10,16 +10,16 @@ document.addEventListener("DOMContentLoaded", () => {
     "Una escritora que cae dentro de su historia y sus personajes le recriminan",
   ];
   const toggleBtn = document.querySelector("#theme-toggle");
-  const root = document.documentElement; 
+  const root = document.documentElement;
 
   /*Preferncia guardada*/
   const savedTheme = localStorage.getItem("theme");
-  activeSelectedMode(savedTheme);
+  applyTheme(savedTheme);
 
-  function activeSelectedMode(style){
+  function applyTheme(style) {
     root.classList.add(style);
-    toggleBtn.textContent = savedTheme === "dark" ? "☀️":"🌙";
-  };  
+    toggleBtn.textContent = savedTheme === "dark" ? "☀️" : "🌙";
+  };
 
   /*Alternancia estilo*/
   toggleBtn.addEventListener("click", () => {
@@ -61,11 +61,44 @@ document.addEventListener("DOMContentLoaded", () => {
   function limpiarIdeasDeUsuarioDelDOM() {
     list.querySelectorAll("li:not(.idea-profesor)").forEach((li) => li.remove());
   }
+  /**
+   * Valida el texto introducido para una nueva idea.
+   * Comprueba que no esté vacío y que no esté duplicado.
+   * @param {string} texto
+   * @returns {boolean}
+   */
+  function validarIdea(texto) {
+    if (texto === "") return false;
+    if (ideas.includes(texto)) return false;
+    return true;
+  }
+
+  /**
+ * Crea el elemento de texto para mostrar una idea en la lista.
+ * @param {string} texto
+ * @returns {HTMLSpanElement}
+ */
+  function crearTextoIdea(texto) {
+    const span = document.createElement("span");
+    span.textContent = texto;
+    span.classList.add("text-[#2E1F27]");
+    return span;
+  }
+
+  function eliminarIdea(texto, li) {
+    li.classList.add("borrando");
+
+    setTimeout(() => {
+      ideas = ideas.filter((idea) => idea !== texto);
+      guardarIdeas();
+      li.remove();
+    }, 250);
+  }
 
   function pintarIdeaEnDOM(texto, fija = false) {
     const li = document.createElement("li");
     li.className = "bg-white p-4 rounded-xl border border-black/10 shadow-sm hover:-translate-y-1 hover:shadow-md transition";
-    
+
     if (fija) li.classList.add("idea-profesor");
 
     if (fija) {
@@ -75,9 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
       li.appendChild(badge);
     }
 
-    const span = document.createElement("span");
-    span.textContent = texto;
-    span.classList.add("text-[#2E1F27]");
+    const span = crearTextoIdea(texto);
     li.appendChild(span);
 
     if (!fija) {
@@ -86,15 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
       button.className = "self-end p-2 rounded-lg opacity-60 hover:opacity-100 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]";
 
       button.addEventListener("click", () => {
-
-        li.classList.add("borrando");
-
-        setTimeout(() => {
-          ideas = ideas.filter((idea) => idea !== texto);
-          guardarIdeas();
-          li.remove();
-        }, 250);
-
+        eliminarIdea(texto, li);
       });
 
       li.appendChild(button);
@@ -123,8 +146,14 @@ document.addEventListener("DOMContentLoaded", () => {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
 
+    /**
+ * Valida el texto introducido para una nueva idea.
+ * Comprueba que no esté vacío y que no esté duplicado.
+ * @param {string} texto
+ * @returns {boolean}
+ */
     const texto = input.value.trim();
-    if (texto === "") return;
+    if (!validarIdea(texto)) return;
 
     ideas.unshift(texto);
     guardarIdeas();
