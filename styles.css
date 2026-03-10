@@ -202,16 +202,22 @@ section {
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
-.btn-apuntar::before {
-  content: "Apuntar";
+/* Texto por defecto */
+.btn-apuntar .btn-apuntar-on {
+  display: none;
 }
 
 .toggle:checked+.btn-apuntar {
   background: var(--color-verde);
 }
 
-.toggle:checked+.btn-apuntar::before {
-  content: "Apuntado";
+/* Texto cuando está marcado */
+.toggle:checked+.btn-apuntar .btn-apuntar-off {
+  display: none;
+}
+
+.toggle:checked+.btn-apuntar .btn-apuntar-on {
+  display: inline;
 }
 
 .btn-apuntar:active {

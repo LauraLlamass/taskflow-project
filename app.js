@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const input = document.querySelector("#idea-input");
   const list = document.querySelector("#idea-list");
   const search = document.querySelector("#idea-search");
+  const clearBtn = document.querySelector("#ideas-clear");
   const ideasProfes = [
     "Un pueblo donde nadie puede mentir",
     "Una biblioteca que reescribe finales",
@@ -30,12 +31,35 @@ document.addEventListener("DOMContentLoaded", () => {
   let ideas = [];
 
   function guardarIdeas() {
-    localStorage.setItem("ideas", JSON.stringify(ideas));
+    // Guarda las ideas del usuario en `localStorage` (persisten al recargar la página).
+    try {
+      const safeIdeas = Array.isArray(ideas) ? ideas.filter((v) => typeof v === "string") : [];
+      localStorage.setItem("ideas", JSON.stringify(safeIdeas));
+    } catch (err) {
+      // Si `localStorage` no está disponible o está lleno, evitamos romper la app.
+      console.warn("No se pudieron guardar las ideas en localStorage:", err);
+    }
+  }
+
+  function eliminarTodasLasIdeasGuardadas() {
+    // Elimina todas las ideas guardadas en `localStorage` (clave: "ideas").
+    try {
+      localStorage.removeItem("ideas");
+      ideas = [];
+      return true;
+    } catch (err) {
+      console.warn("No se pudieron eliminar las ideas de localStorage:", err);
+      return false;
+    }
   }
 
   function cargarIdeas() {
     const data = localStorage.getItem("ideas");
     ideas = data ? JSON.parse(data) : [];
+  }
+
+  function limpiarIdeasDeUsuarioDelDOM() {
+    list.querySelectorAll("li:not(.idea-profesor)").forEach((li) => li.remove());
   }
 
   function pintarIdeaEnDOM(texto, fija = false) {
@@ -123,6 +147,18 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Borrar todo (solo ideas del usuario)
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      const ok = window.confirm("¿Seguro que quieres borrar todas tus ideas guardadas? Esta acción no se puede deshacer.");
+      if (!ok) return;
+      if (!eliminarTodasLasIdeasGuardadas()) return;
+      limpiarIdeasDeUsuarioDelDOM();
+      if (search) search.value = "";
+      input.focus();
+    });
+  }
+
   menuCurso.addEventListener("click", (e) => {
     const btn = e.target.closest("button");
     if (!btn) return;
@@ -135,4 +171,12 @@ document.addEventListener("DOMContentLoaded", () => {
     menuCurso.querySelectorAll("button").forEach(b => b.classList.remove("activo"));
     btn.classList.add("activo");
   });
+
+  //crea una funcion que cuente cuantas ideas estan almacenadas actualmente
+  function contarIdeas() {
+    const ideas = localStorage.getItem("ideas");
+    return ideas ? ideas.length : 0;
+  }
+
+
 });

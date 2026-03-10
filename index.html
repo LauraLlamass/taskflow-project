@@ -72,7 +72,10 @@
             <p>Géneros: Todos narrativa</p>
           </div>
           <input type="checkbox" id="apuntar-1" class="toggle">
-          <label for="apuntar-1" class="badge btn-apuntar"></label>
+          <label for="apuntar-1" class="badge btn-apuntar">
+            <span class="btn-apuntar-off">Apuntar</span>
+            <span class="btn-apuntar-on">Apuntado</span>
+          </label>
         </div>
 
         <div
@@ -82,7 +85,10 @@
             <p>Géneros: Todos</p>
           </div>
           <input type="checkbox" id="apuntar-2" class="toggle">
-          <label for="apuntar-2" class="badge btn-apuntar"></label>
+          <label for="apuntar-2" class="badge btn-apuntar">
+            <span class="btn-apuntar-off">Apuntar</span>
+            <span class="btn-apuntar-on">Apuntado</span>
+          </label>
         </div>
 
         <div
@@ -92,7 +98,10 @@
             <p>Géneros: Fantasía y Ciencia-Ficción</p>
           </div>
           <input type="checkbox" id="apuntar-3" class="toggle">
-          <label for="apuntar-3" class="badge btn-apuntar"></label>
+          <label for="apuntar-3" class="badge btn-apuntar">
+            <span class="btn-apuntar-off">Apuntar</span>
+            <span class="btn-apuntar-on">Apuntado</span>
+          </label>
         </div>
       </div>
     </section>
@@ -106,16 +115,21 @@
 
     <input id="idea-search" type="text" placeholder="Buscar ideas..." autocomplete="off"
       class="w-full max-w-xl px-3 py-2 rounded-xl border border-black/15 bg-white outline-none mt-3 mb-3 focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/20 transition">
-    <form id="idea-form">
+    <form id="idea-form" class="flex items-center gap-2 max-w-xl">
       <input id="idea-input" type="text" placeholder="Escribe una idea..." autocomplete="off"
-        class="w-full max-w-xl px-3 py-2 rounded-xl border border-black/15 bg-white outline-none transition focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/20" />
+        class="flex-1 px-3 py-2 rounded-xl border border-black/15 bg-white outline-none transition focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/20" />
       <button type="submit"
-        class="rounded-full px-4 py-2 bg-[#B76E79] text-white hover:opacity-90 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-        Añadir
+        class="whitespace-nowrap rounded-xl px-4 py-2 bg-[#B76E79] text-white hover:opacity-90 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
+        Añadir idea
       </button>
     </form>
 
     <ul id="idea-list" class="grid grid-cols-1 md:grid-cols-3 gap-4 list-none p-0 mt-2"></ul>
+
+    <button id="ideas-clear" type="button"
+      class="mt-4 rounded-full px-4 py-2 bg-white text-[#2E1F27] border border-[#B76E79]/40 shadow-sm hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
+      Borrar todo
+    </button>
   </section>
 </body>
 
