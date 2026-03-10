@@ -56,3 +56,37 @@ Estos atajos permiten trabajar de forma más rápida dentro del editor.
 Cursor es una herramienta útil para acelerar el desarrollo y mejorar la productividad. Sus funciones de autocompletado, chat contextual y generación de código permiten comprender y modificar proyectos de forma más rápida.
 
 Sin embargo, en algunos casos es necesario revisar y ajustar manualmente el código generado por la IA, ya que puede introducir cambios que no siempre se ajustan exactamente a las necesidades del proyecto.
+
+
+# Experimento con MCP
+
+Para comprender cómo podría utilizarse MCP durante el desarrollo, se realizaron varias consultas utilizando el contexto del proyecto.
+
+El objetivo era comprobar si el asistente de IA podía analizar la estructura de la aplicación y explicar cómo funcionan distintas partes del código.
+
+## Consultas realizadas
+
+Se hicieron preguntas como:
+
+- Explica la estructura de este proyecto.
+- ¿Dónde se almacenan las tareas en esta aplicación?
+- ¿Cómo funciona la barra de progreso?
+- Encuentra la función que actualiza las estadísticas.
+- Explica cómo se utiliza localStorage en esta aplicación.
+
+## Observaciones
+
+El asistente de IA fue capaz de analizar los archivos del proyecto y proporcionar explicaciones basadas en el código existente.
+
+Identificó correctamente varias partes clave de la aplicación, como:
+
+- la estructura de las tareas utilizada en la aplicación
+- cómo se guardan las tareas en localStorage
+- las funciones responsables de renderizar las tareas en el DOM
+- la lógica utilizada para actualizar las estadísticas y la barra de progreso
+
+Esto demuestra cómo el acceso al proyecto mediante MCP permite que la IA proporcione ayuda contextual durante el desarrollo.
+
+## Conclusión
+
+El uso de servidores MCP puede mejorar significativamente la utilidad de las herramientas de IA en entornos de desarrollo. Al poder acceder a archivos del proyecto y otras herramientas externas, el asistente puede comprender mejor el código y ofrecer explicaciones, ayuda para depuración y sugerencias de implementación más precisas.
