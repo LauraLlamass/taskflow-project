@@ -47,13 +47,13 @@ document.addEventListener("DOMContentLoaded", () => {
   /**
    * Guarda las tareas en localStorage.
    */
-  function saveTasks() {
-    try {
-      localStorage.setItem("tasks", JSON.stringify(tasks));
-    } catch (err) {
-      console.warn("No se pudieron guardar las tareas:", err);
-    }
+  function saveTasks(tasks) {
+  try {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  } catch (error) {
+    console.error("Error al guardar tareas:", error);
   }
+}
 
   /**
    * Carga las tareas desde localStorage.
