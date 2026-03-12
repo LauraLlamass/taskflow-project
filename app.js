@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const clearCompletedBtn = document.querySelector("#clear-completed");
   const completeAllBtn = document.querySelector("#complete-all");
   const emptyMessage = document.querySelector("#empty-message");
-const filterType = document.querySelector("#filter-type");
+  const filterType = document.querySelector("#filter-type");
 
   const progressText = document.querySelector("#progress-text");
   const progressBar = document.querySelector("#progress-bar");
@@ -43,7 +43,7 @@ const filterType = document.querySelector("#filter-type");
 
   let tasks = [];
   let currentFilter = "all";
-let currentTypeFilter = "all";
+  let currentTypeFilter = "all";
 
   /** Guarda las tareas en localStorage.*/
   function saveTasks() {
@@ -100,6 +100,12 @@ let currentTypeFilter = "all";
     );
   }
 
+  /**
+ * Permite editar el título de una tarea existente.
+ * Actualiza el array de tareas y guarda los cambios en localStorage.
+ * @param {number} id - Identificador de la tarea.
+ * @param {string} newTitle - Nuevo título de la tarea.
+ */
   function editTask(id, newTitle) {
     const normalizedTitle = newTitle.trim();
 
@@ -119,16 +125,20 @@ let currentTypeFilter = "all";
     updateStats();
   }
 
-  /* Crea un nuevo objeto tarea.*/
-function createTask(title, type) {
-  return {
-    id: Date.now(),
-    title,
-    type,
-    completed: false,
-    createdAt: new Date().toISOString(),
-  };
-}
+/**
+ * Crea un nuevo objeto tarea.
+ * @param {string} title - Título de la tarea.
+ * @param {string} type - Tipo de tarea (escaleta, corregir, worldbuilding, escribir).
+ * @returns {Object} Objeto tarea creado.
+ */function createTask(title, type) {
+    return {
+      id: Date.now(),
+      title,
+      type,
+      completed: false,
+      createdAt: new Date().toISOString(),
+    };
+  }
   /* Actualiza el panel de estadísticas y la barra de progreso.*/
   function getTaskStats(tasks) {
     const total = tasks.length;
@@ -167,6 +177,10 @@ function createTask(title, type) {
     progressBar.classList.toggle("bg-[#B76E79]", !isComplete);
   }
 
+  /**
+ * Actualiza las estadísticas del panel lateral
+ * y la barra de progreso de tareas completadas.
+ */
   function updateStats() {
     const stats = getTaskStats(tasks);
 
@@ -175,6 +189,11 @@ function createTask(title, type) {
     renderProgressBar(stats);
   }
 
+  /**
+   * Elimina una tarea del array de tareas y del DOM.
+   * @param {number} id - Identificador de la tarea.
+   * @param {HTMLElement} li - Elemento HTML de la tarea.
+   */
   /* Elimina una tarea del array y del DOM. */
   function deleteTask(id, li) {
     li.classList.add("borrando");
@@ -255,9 +274,9 @@ function createTask(title, type) {
     meta.textContent = `Creada: ${new Date(task.createdAt).toLocaleDateString("es-ES")}`;
 
     const typeBadge = document.createElement("span");
-typeBadge.textContent = task.type || "escaleta";
-typeBadge.className =
-  "text-xs px-2 py-1 rounded-full bg-slate-200 text-slate-700 self-start";
+    typeBadge.textContent = task.type || "escaleta";
+    typeBadge.className =
+      "text-xs px-2 py-1 rounded-full bg-slate-200 text-slate-700 self-start";
 
     const actions = document.createElement("div");
     actions.className = "self-end flex gap-2";
@@ -289,10 +308,10 @@ typeBadge.className =
     actions.appendChild(editButton);
     actions.appendChild(deleteButton);
 
-  li.appendChild(topRow);
-li.appendChild(meta);
-li.appendChild(typeBadge);
-li.appendChild(actions);
+    li.appendChild(topRow);
+    li.appendChild(meta);
+    li.appendChild(typeBadge);
+    li.appendChild(actions);
 
     list.appendChild(li);
   }
@@ -309,16 +328,26 @@ li.appendChild(actions);
   }
 
   function matchesTypeFilter(task, type) {
-  if (type === "all") return true;
-  return (task.type || "escaleta") === type;
-}
+    if (type === "all") return true;
+    return (task.type || "escaleta") === type;
+  }
 
+  /**
+   * Filtra las tareas según el texto de búsqueda,
+   * el estado (pendiente o completado) y el tipo de tarea.
+   * @param {string} query
+   * @returns {Array} Lista de tareas filtradas.
+   */
   function getFilteredTasks(query = "") {
     return tasks
       .filter((task) => matchesQuery(task, query))
       .filter((task) => matchesStatusFilter(task, currentFilter));
   }
 
+  /**
+ * Renderiza todas las tareas en el DOM aplicando los filtros activos.
+ * @param {string} query - Texto de búsqueda introducido por el usuario.
+ */
   function renderTasks(query = "") {
     list.innerHTML = "";
 
@@ -354,21 +383,21 @@ li.appendChild(actions);
   form.addEventListener("submit", (event) => {
     event.preventDefault();
 
-const title = input.value.trim();
-if (!validateTask(title)) return;
+    const title = input.value.trim();
+    if (!validateTask(title)) return;
 
-const type = taskType.value;
-const newTask = createTask(title, type);
+    const type = taskType.value;
+    const newTask = createTask(title, type);
 
-tasks.unshift(newTask);
+    tasks.unshift(newTask);
 
     saveTasks();
     renderTasks(search.value.toLowerCase());
     updateStats();
 
-input.value = "";
-taskType.value = "escaleta";
-input.focus();
+    input.value = "";
+    taskType.value = "escaleta";
+    input.focus();
   });
 
   if (search) {
@@ -427,10 +456,10 @@ input.focus();
   }
 
   if (filterType) {
-  filterType.addEventListener("change", () => {
-    currentTypeFilter = filterType.value;
-    renderTasks(search.value.toLowerCase());
-  });
-}
+    filterType.addEventListener("change", () => {
+      currentTypeFilter = filterType.value;
+      renderTasks(search.value.toLowerCase());
+    });
+  }
 
 });
