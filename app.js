@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const clearCompletedBtn = document.querySelector("#clear-completed");
   const completeAllBtn = document.querySelector("#complete-all");
   const emptyMessage = document.querySelector("#empty-message");
+const filterType = document.querySelector("#filter-type");
 
   const progressText = document.querySelector("#progress-text");
   const progressBar = document.querySelector("#progress-bar");
@@ -42,6 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let tasks = [];
   let currentFilter = "all";
+let currentTypeFilter = "all";
+
   /** Guarda las tareas en localStorage.*/
   function saveTasks() {
     try {
@@ -305,6 +308,11 @@ li.appendChild(actions);
     return true; // "all"
   }
 
+  function matchesTypeFilter(task, type) {
+  if (type === "all") return true;
+  return (task.type || "escaleta") === type;
+}
+
   function getFilteredTasks(query = "") {
     return tasks
       .filter((task) => matchesQuery(task, query))
@@ -417,5 +425,12 @@ input.focus();
       completeAllTasks();
     });
   }
+
+  if (filterType) {
+  filterType.addEventListener("change", () => {
+    currentTypeFilter = filterType.value;
+    renderTasks(search.value.toLowerCase());
+  });
+}
 
 });
