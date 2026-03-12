@@ -273,9 +273,15 @@ function renderTaskInDOM(task) {
     "p-2 rounded-lg opacity-60 hover:opacity-100 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]";
   deleteButton.setAttribute("aria-label", `Eliminar tarea: ${task.title}`);
 
-  deleteButton.addEventListener("click", () => {
-    deleteTask(task.id, li);
-  });
+ deleteButton.addEventListener("click", () => {
+  const confirmDelete = window.confirm(
+    "¿Seguro que quieres eliminar esta tarea?"
+  );
+
+  if (!confirmDelete) return;
+
+  deleteTask(task.id, li);
+});
 
   actions.appendChild(editButton);
   actions.appendChild(deleteButton);
