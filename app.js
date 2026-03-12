@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   /**
    * Guarda las tareas en localStorage.
    */
-  function saveTasks(tasks) {
+  function saveTasks() {
   try {
     localStorage.setItem("tasks", JSON.stringify(tasks));
   } catch (error) {
@@ -75,9 +75,29 @@ document.addEventListener("DOMContentLoaded", () => {
    * @returns {boolean}
    */
   function validateTask(title) {
-    if (title === "") return false;
-    return !tasks.some((task) => task.title.toLowerCase() === title.toLowerCase());
+  // Validate input type
+  if (typeof title !== "string") {
+    return false;
   }
+
+  // Remove leading/trailing spaces
+  const normalizedTitle = title.trim();
+
+  // Check empty title after trimming
+  if (!normalizedTitle) {
+    return false;
+  }
+
+  // Normalize for comparison
+  const lowerTitle = normalizedTitle.toLowerCase();
+
+  // Check if a task with the same title already exists
+  const isDuplicate = tasks.some(
+    (task) => task.title.trim().toLowerCase() === lowerTitle
+  );
+
+  return !isDuplicate;
+}
 
   /**
    * Crea un nuevo objeto tarea.
@@ -96,32 +116,50 @@ document.addEventListener("DOMContentLoaded", () => {
   /**
  * Actualiza el panel de estadísticas y la barra de progreso.
  */
-  function updateStats() {
-    const total = tasks.length;
-    const completed = tasks.filter((task) => task.completed).length;
-    const pending = total - completed;
+function getTaskStats(tasks) {
+  const total = tasks.length;
+  const completed = tasks.filter((task) => task.completed).length;
+  const pending = total - completed;
+  const percentage = total === 0 ? 0 : (completed / total) * 100;
 
-    totalEl.textContent = total;
-    completedEl.textContent = completed;
-    pendingEl.textContent = pending;
+  return {
+    total,
+    completed,
+    pending,
+    percentage,
+  };
+}
 
-    if (progressText) {
-      progressText.textContent = `${completed} / ${total} tareas completadas`;
-    }
+function renderTaskStats({ total, completed, pending }) {
+  totalEl.textContent = total;
+  completedEl.textContent = completed;
+  pendingEl.textContent = pending;
+}
 
-    if (progressBar) {
-      const percentage = total === 0 ? 0 : (completed / total) * 100;
-      progressBar.style.width = `${percentage}%`;
+function renderProgressText({ total, completed }) {
+  if (!progressText) return;
 
-      if (percentage === 100) {
-        progressBar.classList.remove("bg-[#B76E79]");
-        progressBar.classList.add("bg-green-500");
-      } else {
-        progressBar.classList.remove("bg-green-500");
-        progressBar.classList.add("bg-[#B76E79]");
-      }
-    }
-  }
+  progressText.textContent = `${completed} / ${total} tareas completadas`;
+}
+
+function renderProgressBar({ percentage }) {
+  if (!progressBar) return;
+
+  progressBar.style.width = `${percentage}%`;
+
+  const isComplete = percentage === 100;
+
+  progressBar.classList.toggle("bg-green-500", isComplete);
+  progressBar.classList.toggle("bg-[#B76E79]", !isComplete);
+}
+
+function updateStats() {
+  const stats = getTaskStats(tasks);
+
+  renderTaskStats(stats);
+  renderProgressText(stats);
+  renderProgressBar(stats);
+}
 
   /**
    * Elimina una tarea del array y del DOM.
@@ -241,23 +279,30 @@ document.addEventListener("DOMContentLoaded", () => {
    * Renderiza todas las tareas, opcionalmente filtradas por texto.
    * @param {string} query
    */
-  function renderTasks(query = "") {
-    list.innerHTML = "";
+  function matchesQuery(task, query) {
+  return task.title.toLowerCase().includes(query);
+}
 
-    let filteredTasks = tasks.filter((task) =>
-      task.title.toLowerCase().includes(query)
-    );
+function matchesStatusFilter(task, filter) {
+  if (filter === "pending") return !task.completed;
+  if (filter === "completed") return task.completed;
+  return true; // "all"
+}
 
-    if (currentFilter === "pending") {
-      filteredTasks = filteredTasks.filter((task) => !task.completed);
-    }
+function getFilteredTasks(query = "") {
+  return tasks
+    .filter((task) => matchesQuery(task, query))
+    .filter((task) => matchesStatusFilter(task, currentFilter));
+}
 
-    if (currentFilter === "completed") {
-      filteredTasks = filteredTasks.filter((task) => task.completed);
-    }
+function renderTasks(query = "") {
+  list.innerHTML = "";
 
-    filteredTasks.forEach((task) => renderTaskInDOM(task));
-  }
+  const filteredTasks = getFilteredTasks(query);
+
+  filteredTasks.forEach((task) => renderTaskInDOM(task));
+}
+
   /**
    * Elimina todas las tareas.
    * @returns {boolean}
