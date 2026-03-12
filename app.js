@@ -25,10 +25,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const savedTheme = localStorage.getItem("theme");
   applyTheme(savedTheme);
 
-  /**
-   * Aplica el tema guardado a la aplicación.
-   * @param {string | null} style
-   */
+  /* Aplica el tema guardado a la aplicación.*/
   function applyTheme(style) {
     if (style) {
       root.classList.add(style);
@@ -44,20 +41,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let tasks = [];
   let currentFilter = "all";
-  /**
-   * Guarda las tareas en localStorage.
-   */
+  /** Guarda las tareas en localStorage.*/
   function saveTasks() {
-  try {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-  } catch (error) {
-    console.error("Error al guardar tareas:", error);
+    try {
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    } catch (error) {
+      console.error("Error al guardar tareas:", error);
+    }
   }
-}
 
-  /**
-   * Carga las tareas desde localStorage.
-   */
+  /* Carga las tareas desde localStorage.*/
   function loadTasks() {
     try {
       const data = localStorage.getItem("tasks");
@@ -68,30 +61,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /**
-   * Valida el título de una nueva tarea.
-   * Comprueba que no esté vacío y que no esté duplicado.
-   * @param {string} title
-   * @returns {boolean}
-   */
-  function validateTask(title) {
-  // Validate input type
+  /* Valida el título de una nueva tarea.  Comprueba que no esté vacío y que no esté duplicado.*/
+ function validateTask(title) {
   if (typeof title !== "string") {
     return false;
   }
 
-  // Remove leading/trailing spaces
   const normalizedTitle = title.trim();
 
-  // Check empty title after trimming
   if (!normalizedTitle) {
     return false;
   }
 
-  // Normalize for comparison
   const lowerTitle = normalizedTitle.toLowerCase();
 
-  // Check if a task with the same title already exists
   const isDuplicate = tasks.some(
     (task) => task.title.trim().toLowerCase() === lowerTitle
   );
@@ -99,11 +82,40 @@ document.addEventListener("DOMContentLoaded", () => {
   return !isDuplicate;
 }
 
-  /**
-   * Crea un nuevo objeto tarea.
-   * @param {string} title
-   * @returns {{id: number, title: string, completed: boolean, createdAt: string}}
-   */
+function validateEditedTask(id, title) {
+  const normalizedTitle = title.trim();
+
+  if (!normalizedTitle) {
+    return false;
+  }
+
+  return !tasks.some(
+    (task) =>
+      task.id !== id &&
+      task.title.trim().toLowerCase() === normalizedTitle.toLowerCase()
+  );
+}
+
+function editTask(id, newTitle) {
+  const normalizedTitle = newTitle.trim();
+
+  if (!validateEditedTask(id, normalizedTitle)) {
+    alert("El título no puede estar vacío ni duplicado.");
+    return;
+  }
+
+  const taskToEdit = tasks.find((task) => task.id === id);
+
+  if (!taskToEdit) return;
+
+  taskToEdit.title = normalizedTitle;
+
+  saveTasks();
+  renderTasks(search.value.toLowerCase());
+  updateStats();
+}
+
+  /* Crea un nuevo objeto tarea.*/
   function createTask(title) {
     return {
       id: Date.now(),
@@ -113,59 +125,53 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  /**
- * Actualiza el panel de estadísticas y la barra de progreso.
- */
-function getTaskStats(tasks) {
-  const total = tasks.length;
-  const completed = tasks.filter((task) => task.completed).length;
-  const pending = total - completed;
-  const percentage = total === 0 ? 0 : (completed / total) * 100;
+  /* Actualiza el panel de estadísticas y la barra de progreso.*/
+  function getTaskStats(tasks) {
+    const total = tasks.length;
+    const completed = tasks.filter((task) => task.completed).length;
+    const pending = total - completed;
+    const percentage = total === 0 ? 0 : (completed / total) * 100;
 
-  return {
-    total,
-    completed,
-    pending,
-    percentage,
-  };
-}
+    return {
+      total,
+      completed,
+      pending,
+      percentage,
+    };
+  }
 
-function renderTaskStats({ total, completed, pending }) {
-  totalEl.textContent = total;
-  completedEl.textContent = completed;
-  pendingEl.textContent = pending;
-}
+  function renderTaskStats({ total, completed, pending }) {
+    totalEl.textContent = total;
+    completedEl.textContent = completed;
+    pendingEl.textContent = pending;
+  }
 
-function renderProgressText({ total, completed }) {
-  if (!progressText) return;
+  function renderProgressText({ total, completed }) {
+    if (!progressText) return;
 
-  progressText.textContent = `${completed} / ${total} tareas completadas`;
-}
+    progressText.textContent = `${completed} / ${total} tareas completadas`;
+  }
 
-function renderProgressBar({ percentage }) {
-  if (!progressBar) return;
+  function renderProgressBar({ percentage }) {
+    if (!progressBar) return;
 
-  progressBar.style.width = `${percentage}%`;
+    progressBar.style.width = `${percentage}%`;
 
-  const isComplete = percentage === 100;
+    const isComplete = percentage === 100;
 
-  progressBar.classList.toggle("bg-green-500", isComplete);
-  progressBar.classList.toggle("bg-[#B76E79]", !isComplete);
-}
+    progressBar.classList.toggle("bg-green-500", isComplete);
+    progressBar.classList.toggle("bg-[#B76E79]", !isComplete);
+  }
 
-function updateStats() {
-  const stats = getTaskStats(tasks);
+  function updateStats() {
+    const stats = getTaskStats(tasks);
 
-  renderTaskStats(stats);
-  renderProgressText(stats);
-  renderProgressBar(stats);
-}
+    renderTaskStats(stats);
+    renderProgressText(stats);
+    renderProgressBar(stats);
+  }
 
-  /**
-   * Elimina una tarea del array y del DOM.
-   * @param {number} id
-   * @param {HTMLLIElement} li
-   */
+  /* Elimina una tarea del array y del DOM. */
   function deleteTask(id, li) {
     li.classList.add("borrando");
 
@@ -177,11 +183,7 @@ function updateStats() {
     }, 250);
   }
 
-  /**
-   * Cambia el estado completed de una tarea.
-   * @param {number} id
-   * @param {boolean} checked
-   */
+  /* Cambia el estado completed de una tarea.*/
   function toggleTaskCompleted(id, checked) {
     tasks = tasks.map((task) =>
       task.id === id ? { ...task, completed: checked } : task
@@ -192,9 +194,7 @@ function updateStats() {
     renderTasks(search.value.toLowerCase());
   }
 
-  /**
-   * Marca todas las tareas como completadas.
-   */
+  /* Marca todas las tareas como completadas.*/
   function completeAllTasks() {
     tasks = tasks.map((task) => ({
       ...task,
@@ -206,12 +206,7 @@ function updateStats() {
     updateStats();
   }
 
-  /**
-   * Crea el texto visible de una tarea.
-   * @param {string} title
-   * @param {boolean} completed
-   * @returns {HTMLSpanElement}
-   */
+  /* Crea el texto visible de una tarea.*/
   function createTaskText(title, completed) {
     const span = document.createElement("span");
     span.textContent = title;
@@ -222,64 +217,78 @@ function updateStats() {
   }
 
   if (tasks.length === 0) {
-    emptyMessage.style.display = "block";
-  } else {
-    emptyMessage.style.display = "none";
-  }
+  emptyMessage.style.display = "block";
+} else {
+  emptyMessage.style.display = "none";
+}
 
-  /**
-   * Renderiza una tarea en el DOM.
-   * @param {{id: number, title: string, completed: boolean, createdAt: string}} task
-   */
-  function renderTaskInDOM(task) {
-    const li = document.createElement("li");
-    li.className =
-      "bg-white p-4 rounded-xl border border-black/10 shadow-sm hover:-translate-y-1 hover:shadow-md transition flex flex-col gap-3 dark:bg-white/60";
+/* Renderiza una tarea en el DOM.*/
+function renderTaskInDOM(task) {
+  const li = document.createElement("li");
+  li.className =
+    "bg-white p-4 rounded-xl border border-black/10 shadow-sm hover:-translate-y-1 hover:shadow-md transition flex flex-col gap-3 dark:bg-white/60";
 
-    const topRow = document.createElement("div");
-    topRow.className = "flex items-start gap-3";
+  const topRow = document.createElement("div");
+  topRow.className = "flex items-start gap-3";
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = task.completed;
-    checkbox.className = "mt-1 h-4 w-4 accent-[#B76E79]";
-    checkbox.setAttribute("aria-label", `Marcar tarea: ${task.title}`);
+  const checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.checked = task.completed;
+  checkbox.className = "mt-1 h-4 w-4 accent-[#B76E79]";
+  checkbox.setAttribute("aria-label", `Marcar tarea: ${task.title}`);
 
-    checkbox.addEventListener("change", () => {
-      toggleTaskCompleted(task.id, checkbox.checked);
-    });
+  checkbox.addEventListener("change", () => {
+    toggleTaskCompleted(task.id, checkbox.checked);
+  });
 
-    const text = createTaskText(task.title, task.completed);
+  const text = createTaskText(task.title, task.completed);
 
-    topRow.appendChild(checkbox);
-    topRow.appendChild(text);
+  topRow.appendChild(checkbox);
+  topRow.appendChild(text);
 
-    const meta = document.createElement("p");
-    meta.className = "text-xs opacity-60";
-    meta.textContent = `Creada: ${new Date(task.createdAt).toLocaleDateString("es-ES")}`;
+  const meta = document.createElement("p");
+  meta.className = "text-xs opacity-60";
+  meta.textContent = `Creada: ${new Date(task.createdAt).toLocaleDateString("es-ES")}`;
 
-    const button = document.createElement("button");
-    button.textContent = "🗑️";
-    button.className =
-      "self-end p-2 rounded-lg opacity-60 hover:opacity-100 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]";
-    button.setAttribute("aria-label", `Eliminar tarea: ${task.title}`);
+  const actions = document.createElement("div");
+  actions.className = "self-end flex gap-2";
 
-    button.addEventListener("click", () => {
-      deleteTask(task.id, li);
-    });
+  const editButton = document.createElement("button");
+  editButton.textContent = "✏️";
+  editButton.className =
+    "p-2 rounded-lg opacity-60 hover:opacity-100 hover:bg-blue-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400";
+  editButton.setAttribute("aria-label", `Editar tarea: ${task.title}`);
 
-    li.appendChild(topRow);
-    li.appendChild(meta);
-    li.appendChild(button);
+  editButton.addEventListener("click", () => {
+    const newTitle = window.prompt("Edita el título de la tarea:", task.title);
 
-    list.appendChild(li);
-  }
+    if (newTitle === null) return;
 
-  /**
-   * Renderiza todas las tareas, opcionalmente filtradas por texto.
-   * @param {string} query
-   */
-  function matchesQuery(task, query) {
+    editTask(task.id, newTitle);
+  });
+
+  const deleteButton = document.createElement("button");
+  deleteButton.textContent = "🗑️";
+  deleteButton.className =
+    "p-2 rounded-lg opacity-60 hover:opacity-100 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]";
+  deleteButton.setAttribute("aria-label", `Eliminar tarea: ${task.title}`);
+
+  deleteButton.addEventListener("click", () => {
+    deleteTask(task.id, li);
+  });
+
+  actions.appendChild(editButton);
+  actions.appendChild(deleteButton);
+
+  li.appendChild(topRow);
+  li.appendChild(meta);
+  li.appendChild(actions);
+
+  list.appendChild(li);
+}
+
+/* Renderiza todas las tareas, opcionalmente filtradas por texto.*/
+function matchesQuery(task, query) {
   return task.title.toLowerCase().includes(query);
 }
 
@@ -303,105 +312,100 @@ function renderTasks(query = "") {
   filteredTasks.forEach((task) => renderTaskInDOM(task));
 }
 
-  /**
-   * Elimina todas las tareas.
-   * @returns {boolean}
-   */
-  function clearAllTasks() {
-    try {
-      localStorage.removeItem("tasks");
-      tasks = [];
-      return true;
-    } catch (err) {
-      console.warn("No se pudieron eliminar las tareas:", err);
-      return false;
-    }
+/* Elimina todas las tareas.*/
+function clearAllTasks() {
+  try {
+    localStorage.removeItem("tasks");
+    tasks = [];
+    return true;
+  } catch (err) {
+    console.warn("No se pudieron eliminar las tareas:", err);
+    return false;
   }
+}
 
-  /**
- * Elimina todas las tareas completadas.
- */
-  function clearCompletedTasks() {
-    tasks = tasks.filter((task) => !task.completed);
-    saveTasks();
-    renderTasks(search.value.toLowerCase());
-    updateStats();
-  }
+/* Elimina todas las tareas completadas,*/
+function clearCompletedTasks() {
+  tasks = tasks.filter((task) => !task.completed);
+  saveTasks();
+  renderTasks(search.value.toLowerCase());
+  updateStats();
+}
 
-  loadTasks();
-  renderTasks();
+loadTasks();
+renderTasks();
+updateStats();
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const title = input.value.trim();
+  if (!validateTask(title)) return;
+
+  const newTask = createTask(title);
+  tasks.unshift(newTask);
+
+  saveTasks();
+  renderTasks(search.value.toLowerCase());
   updateStats();
 
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
+  input.value = "";
+  input.focus();
+});
 
-    const title = input.value.trim();
-    if (!validateTask(title)) return;
-
-    const newTask = createTask(title);
-    tasks.unshift(newTask);
-
-    saveTasks();
+if (search) {
+  search.addEventListener("input", () => {
     renderTasks(search.value.toLowerCase());
-    updateStats();
+  });
+}
 
-    input.value = "";
+if (clearBtn) {
+  clearBtn.addEventListener("click", () => {
+    const ok = window.confirm(
+      "¿Seguro que quieres borrar todas las tareas? Esta acción no se puede deshacer."
+    );
+    if (!ok) return;
+    if (!clearAllTasks()) return;
+
+    renderTasks();
+    updateStats();
+    if (search) search.value = "";
     input.focus();
   });
+}
+if (filterAllBtn) {
+  filterAllBtn.addEventListener("click", () => {
+    currentFilter = "all";
+    renderTasks(search.value.toLowerCase());
+  });
+}
 
-  if (search) {
-    search.addEventListener("input", () => {
-      renderTasks(search.value.toLowerCase());
-    });
-  }
+if (filterPendingBtn) {
+  filterPendingBtn.addEventListener("click", () => {
+    currentFilter = "pending";
+    renderTasks(search.value.toLowerCase());
+  });
+}
 
-  if (clearBtn) {
-    clearBtn.addEventListener("click", () => {
-      const ok = window.confirm(
-        "¿Seguro que quieres borrar todas las tareas? Esta acción no se puede deshacer."
-      );
-      if (!ok) return;
-      if (!clearAllTasks()) return;
+if (filterCompletedBtn) {
+  filterCompletedBtn.addEventListener("click", () => {
+    currentFilter = "completed";
+    renderTasks(search.value.toLowerCase());
+  });
+}
 
-      renderTasks();
-      updateStats();
-      if (search) search.value = "";
-      input.focus();
-    });
-  }
-  if (filterAllBtn) {
-    filterAllBtn.addEventListener("click", () => {
-      currentFilter = "all";
-      renderTasks(search.value.toLowerCase());
-    });
-  }
+if (clearCompletedBtn) {
+  clearCompletedBtn.addEventListener("click", () => {
+    const ok = window.confirm("¿Seguro que quieres borrar todas las tareas completadas?");
+    if (!ok) return;
+    clearCompletedTasks();
+  });
+}
 
-  if (filterPendingBtn) {
-    filterPendingBtn.addEventListener("click", () => {
-      currentFilter = "pending";
-      renderTasks(search.value.toLowerCase());
-    });
-  }
-
-  if (filterCompletedBtn) {
-    filterCompletedBtn.addEventListener("click", () => {
-      currentFilter = "completed";
-      renderTasks(search.value.toLowerCase());
-    });
-  }
-
-  if (clearCompletedBtn) {
-    clearCompletedBtn.addEventListener("click", () => {
-      const ok = window.confirm("¿Seguro que quieres borrar todas las tareas completadas?");
-      if (!ok) return;
-      clearCompletedTasks();
-    });
-  }
-
-  if (completeAllBtn) {
-    completeAllBtn.addEventListener("click", () => {
-      completeAllTasks();
-    });
-  }
+if (completeAllBtn) {
+  completeAllBtn.addEventListener("click", () => {
+    completeAllTasks();
+  });
+}
 
 });
