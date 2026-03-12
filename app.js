@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const form = document.querySelector("#task-form");
   const input = document.querySelector("#task-input");
   const list = document.querySelector("#task-list");
+  const taskType = document.querySelector("#task-type");
   const search = document.querySelector("#task-search");
   const clearBtn = document.querySelector("#tasks-clear");
   const clearCompletedBtn = document.querySelector("#clear-completed");
@@ -62,69 +63,69 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   /* Valida el título de una nueva tarea.  Comprueba que no esté vacío y que no esté duplicado.*/
- function validateTask(title) {
-  if (typeof title !== "string") {
-    return false;
+  function validateTask(title) {
+    if (typeof title !== "string") {
+      return false;
+    }
+
+    const normalizedTitle = title.trim();
+
+    if (!normalizedTitle) {
+      return false;
+    }
+
+    const lowerTitle = normalizedTitle.toLowerCase();
+
+    const isDuplicate = tasks.some(
+      (task) => task.title.trim().toLowerCase() === lowerTitle
+    );
+
+    return !isDuplicate;
   }
 
-  const normalizedTitle = title.trim();
+  function validateEditedTask(id, title) {
+    const normalizedTitle = title.trim();
 
-  if (!normalizedTitle) {
-    return false;
+    if (!normalizedTitle) {
+      return false;
+    }
+
+    return !tasks.some(
+      (task) =>
+        task.id !== id &&
+        task.title.trim().toLowerCase() === normalizedTitle.toLowerCase()
+    );
   }
 
-  const lowerTitle = normalizedTitle.toLowerCase();
+  function editTask(id, newTitle) {
+    const normalizedTitle = newTitle.trim();
 
-  const isDuplicate = tasks.some(
-    (task) => task.title.trim().toLowerCase() === lowerTitle
-  );
+    if (!validateEditedTask(id, normalizedTitle)) {
+      alert("El título no puede estar vacío ni duplicado.");
+      return;
+    }
 
-  return !isDuplicate;
-}
+    const taskToEdit = tasks.find((task) => task.id === id);
 
-function validateEditedTask(id, title) {
-  const normalizedTitle = title.trim();
+    if (!taskToEdit) return;
 
-  if (!normalizedTitle) {
-    return false;
+    taskToEdit.title = normalizedTitle;
+
+    saveTasks();
+    renderTasks(search.value.toLowerCase());
+    updateStats();
   }
-
-  return !tasks.some(
-    (task) =>
-      task.id !== id &&
-      task.title.trim().toLowerCase() === normalizedTitle.toLowerCase()
-  );
-}
-
-function editTask(id, newTitle) {
-  const normalizedTitle = newTitle.trim();
-
-  if (!validateEditedTask(id, normalizedTitle)) {
-    alert("El título no puede estar vacío ni duplicado.");
-    return;
-  }
-
-  const taskToEdit = tasks.find((task) => task.id === id);
-
-  if (!taskToEdit) return;
-
-  taskToEdit.title = normalizedTitle;
-
-  saveTasks();
-  renderTasks(search.value.toLowerCase());
-  updateStats();
-}
 
   /* Crea un nuevo objeto tarea.*/
-  function createTask(title) {
-    return {
-      id: Date.now(),
-      title,
-      completed: false,
-      createdAt: new Date().toISOString(),
-    };
-  }
-
+function createTask(title, type) {
+  return {
+    id: Date.now(),
+    title,
+    type,
+    completed: false,
+    createdAt: new Date().toISOString(),
+  };
+}
   /* Actualiza el panel de estadísticas y la barra de progreso.*/
   function getTaskStats(tasks) {
     const total = tasks.length;
@@ -217,201 +218,204 @@ function editTask(id, newTitle) {
   }
 
   if (tasks.length === 0) {
-  emptyMessage.style.display = "block";
-} else {
-  emptyMessage.style.display = "none";
-}
+    emptyMessage.style.display = "block";
+  } else {
+    emptyMessage.style.display = "none";
+  }
 
-/* Renderiza una tarea en el DOM.*/
-function renderTaskInDOM(task) {
-  const li = document.createElement("li");
-  li.className =
-    "bg-white p-4 rounded-xl border border-black/10 shadow-sm hover:-translate-y-1 hover:shadow-md transition flex flex-col gap-3 dark:bg-white/60";
+  /* Renderiza una tarea en el DOM.*/
+  function renderTaskInDOM(task) {
+    const li = document.createElement("li");
+    li.className =
+      "bg-white p-4 rounded-xl border border-black/10 shadow-sm hover:-translate-y-1 hover:shadow-md transition flex flex-col gap-3 dark:bg-white/60";
 
-  const topRow = document.createElement("div");
-  topRow.className = "flex items-start gap-3";
+    const topRow = document.createElement("div");
+    topRow.className = "flex items-start gap-3";
 
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked = task.completed;
-  checkbox.className = "mt-1 h-4 w-4 accent-[#B76E79]";
-  checkbox.setAttribute("aria-label", `Marcar tarea: ${task.title}`);
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = task.completed;
+    checkbox.className = "mt-1 h-4 w-4 accent-[#B76E79]";
+    checkbox.setAttribute("aria-label", `Marcar tarea: ${task.title}`);
 
-  checkbox.addEventListener("change", () => {
-    toggleTaskCompleted(task.id, checkbox.checked);
-  });
+    checkbox.addEventListener("change", () => {
+      toggleTaskCompleted(task.id, checkbox.checked);
+    });
 
-  const text = createTaskText(task.title, task.completed);
+    const text = createTaskText(task.title, task.completed);
 
-  topRow.appendChild(checkbox);
-  topRow.appendChild(text);
+    topRow.appendChild(checkbox);
+    topRow.appendChild(text);
 
-  const meta = document.createElement("p");
-  meta.className = "text-xs opacity-60";
-  meta.textContent = `Creada: ${new Date(task.createdAt).toLocaleDateString("es-ES")}`;
+    const meta = document.createElement("p");
+    meta.className = "text-xs opacity-60";
+    meta.textContent = `Creada: ${new Date(task.createdAt).toLocaleDateString("es-ES")}`;
 
-  const actions = document.createElement("div");
-  actions.className = "self-end flex gap-2";
+    const typeBadge = document.createElement("span");
+typeBadge.textContent = task.type || "escaleta";
+typeBadge.className =
+  "text-xs px-2 py-1 rounded-full bg-slate-200 text-slate-700 self-start";
 
-  const editButton = document.createElement("button");
-  editButton.textContent = "✏️";
-  editButton.className =
-    "p-2 rounded-lg opacity-60 hover:opacity-100 hover:bg-blue-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400";
-  editButton.setAttribute("aria-label", `Editar tarea: ${task.title}`);
+    const actions = document.createElement("div");
+    actions.className = "self-end flex gap-2";
 
-  editButton.addEventListener("click", () => {
-    const newTitle = window.prompt("Edita el título de la tarea:", task.title);
+    const editButton = document.createElement("button");
+    editButton.textContent = "✏️";
+    editButton.className =
+      "p-2 rounded-lg opacity-60 hover:opacity-100 hover:bg-blue-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400";
+    editButton.setAttribute("aria-label", `Editar tarea: ${task.title}`);
 
-    if (newTitle === null) return;
+    editButton.addEventListener("click", () => {
+      const newTitle = window.prompt("Edita el título de la tarea:", task.title);
 
-    editTask(task.id, newTitle);
-  });
+      if (newTitle === null) return;
 
-  const deleteButton = document.createElement("button");
-  deleteButton.textContent = "🗑️";
-  deleteButton.className =
-    "p-2 rounded-lg opacity-60 hover:opacity-100 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]";
-  deleteButton.setAttribute("aria-label", `Eliminar tarea: ${task.title}`);
+      editTask(task.id, newTitle);
+    });
 
- deleteButton.addEventListener("click", () => {
-  const confirmDelete = window.confirm(
-    "¿Seguro que quieres eliminar esta tarea?"
-  );
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "🗑️";
+    deleteButton.className =
+      "p-2 rounded-lg opacity-60 hover:opacity-100 hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]";
+    deleteButton.setAttribute("aria-label", `Eliminar tarea: ${task.title}`);
 
-  if (!confirmDelete) return;
+    deleteButton.addEventListener("click", () => {
+      deleteTask(task.id, li);
+    });
 
-  deleteTask(task.id, li);
-});
-
-  actions.appendChild(editButton);
-  actions.appendChild(deleteButton);
+    actions.appendChild(editButton);
+    actions.appendChild(deleteButton);
 
   li.appendChild(topRow);
-  li.appendChild(meta);
-  li.appendChild(actions);
+li.appendChild(meta);
+li.appendChild(typeBadge);
+li.appendChild(actions);
 
-  list.appendChild(li);
-}
-
-/* Renderiza todas las tareas, opcionalmente filtradas por texto.*/
-function matchesQuery(task, query) {
-  return task.title.toLowerCase().includes(query);
-}
-
-function matchesStatusFilter(task, filter) {
-  if (filter === "pending") return !task.completed;
-  if (filter === "completed") return task.completed;
-  return true; // "all"
-}
-
-function getFilteredTasks(query = "") {
-  return tasks
-    .filter((task) => matchesQuery(task, query))
-    .filter((task) => matchesStatusFilter(task, currentFilter));
-}
-
-function renderTasks(query = "") {
-  list.innerHTML = "";
-
-  const filteredTasks = getFilteredTasks(query);
-
-  filteredTasks.forEach((task) => renderTaskInDOM(task));
-}
-
-/* Elimina todas las tareas.*/
-function clearAllTasks() {
-  try {
-    localStorage.removeItem("tasks");
-    tasks = [];
-    return true;
-  } catch (err) {
-    console.warn("No se pudieron eliminar las tareas:", err);
-    return false;
+    list.appendChild(li);
   }
-}
 
-/* Elimina todas las tareas completadas,*/
-function clearCompletedTasks() {
-  tasks = tasks.filter((task) => !task.completed);
-  saveTasks();
-  renderTasks(search.value.toLowerCase());
-  updateStats();
-}
+  /* Renderiza todas las tareas, opcionalmente filtradas por texto.*/
+  function matchesQuery(task, query) {
+    return task.title.toLowerCase().includes(query);
+  }
 
-loadTasks();
-renderTasks();
-updateStats();
+  function matchesStatusFilter(task, filter) {
+    if (filter === "pending") return !task.completed;
+    if (filter === "completed") return task.completed;
+    return true; // "all"
+  }
 
-form.addEventListener("submit", (event) => {
-  event.preventDefault();
+  function getFilteredTasks(query = "") {
+    return tasks
+      .filter((task) => matchesQuery(task, query))
+      .filter((task) => matchesStatusFilter(task, currentFilter));
+  }
 
-  const title = input.value.trim();
-  if (!validateTask(title)) return;
+  function renderTasks(query = "") {
+    list.innerHTML = "";
 
-  const newTask = createTask(title);
-  tasks.unshift(newTask);
+    const filteredTasks = getFilteredTasks(query);
 
-  saveTasks();
-  renderTasks(search.value.toLowerCase());
-  updateStats();
+    filteredTasks.forEach((task) => renderTaskInDOM(task));
+  }
 
-  input.value = "";
-  input.focus();
-});
+  /* Elimina todas las tareas.*/
+  function clearAllTasks() {
+    try {
+      localStorage.removeItem("tasks");
+      tasks = [];
+      return true;
+    } catch (err) {
+      console.warn("No se pudieron eliminar las tareas:", err);
+      return false;
+    }
+  }
 
-if (search) {
-  search.addEventListener("input", () => {
+  /* Elimina todas las tareas completadas,*/
+  function clearCompletedTasks() {
+    tasks = tasks.filter((task) => !task.completed);
+    saveTasks();
     renderTasks(search.value.toLowerCase());
-  });
-}
-
-if (clearBtn) {
-  clearBtn.addEventListener("click", () => {
-    const ok = window.confirm(
-      "¿Seguro que quieres borrar todas las tareas? Esta acción no se puede deshacer."
-    );
-    if (!ok) return;
-    if (!clearAllTasks()) return;
-
-    renderTasks();
     updateStats();
-    if (search) search.value = "";
-    input.focus();
-  });
-}
-if (filterAllBtn) {
-  filterAllBtn.addEventListener("click", () => {
-    currentFilter = "all";
+  }
+
+  loadTasks();
+  renderTasks();
+  updateStats();
+
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+const title = input.value.trim();
+if (!validateTask(title)) return;
+
+const type = taskType.value;
+const newTask = createTask(title, type);
+
+tasks.unshift(newTask);
+
+    saveTasks();
     renderTasks(search.value.toLowerCase());
-  });
-}
+    updateStats();
 
-if (filterPendingBtn) {
-  filterPendingBtn.addEventListener("click", () => {
-    currentFilter = "pending";
-    renderTasks(search.value.toLowerCase());
+input.value = "";
+taskType.value = "escaleta";
+input.focus();
   });
-}
 
-if (filterCompletedBtn) {
-  filterCompletedBtn.addEventListener("click", () => {
-    currentFilter = "completed";
-    renderTasks(search.value.toLowerCase());
-  });
-}
+  if (search) {
+    search.addEventListener("input", () => {
+      renderTasks(search.value.toLowerCase());
+    });
+  }
 
-if (clearCompletedBtn) {
-  clearCompletedBtn.addEventListener("click", () => {
-    const ok = window.confirm("¿Seguro que quieres borrar todas las tareas completadas?");
-    if (!ok) return;
-    clearCompletedTasks();
-  });
-}
+  if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+      const ok = window.confirm(
+        "¿Seguro que quieres borrar todas las tareas? Esta acción no se puede deshacer."
+      );
+      if (!ok) return;
+      if (!clearAllTasks()) return;
 
-if (completeAllBtn) {
-  completeAllBtn.addEventListener("click", () => {
-    completeAllTasks();
-  });
-}
+      renderTasks();
+      updateStats();
+      if (search) search.value = "";
+      input.focus();
+    });
+  }
+  if (filterAllBtn) {
+    filterAllBtn.addEventListener("click", () => {
+      currentFilter = "all";
+      renderTasks(search.value.toLowerCase());
+    });
+  }
+
+  if (filterPendingBtn) {
+    filterPendingBtn.addEventListener("click", () => {
+      currentFilter = "pending";
+      renderTasks(search.value.toLowerCase());
+    });
+  }
+
+  if (filterCompletedBtn) {
+    filterCompletedBtn.addEventListener("click", () => {
+      currentFilter = "completed";
+      renderTasks(search.value.toLowerCase());
+    });
+  }
+
+  if (clearCompletedBtn) {
+    clearCompletedBtn.addEventListener("click", () => {
+      const ok = window.confirm("¿Seguro que quieres borrar todas las tareas completadas?");
+      if (!ok) return;
+      clearCompletedTasks();
+    });
+  }
+
+  if (completeAllBtn) {
+    completeAllBtn.addEventListener("click", () => {
+      completeAllTasks();
+    });
+  }
 
 });
