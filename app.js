@@ -28,12 +28,13 @@ document.addEventListener("DOMContentLoaded", () => {
   applyTheme(savedTheme);
 
   /* Aplica el tema guardado a la aplicación.*/
-  function applyTheme(style) {
-    if (style) {
-      root.classList.add(style);
-    }
-    toggleBtn.textContent = style === "dark" ? "☀️" : "🌙";
+function applyTheme(style) {
+  root.classList.remove("dark");
+  if (style === "dark") {
+    root.classList.add("dark");
   }
+  toggleBtn.textContent = style === "dark" ? "☀️" : "🌙";
+}
 
   toggleBtn.addEventListener("click", () => {
     const isDark = root.classList.toggle("dark");
@@ -195,16 +196,16 @@ document.addEventListener("DOMContentLoaded", () => {
    * @param {HTMLElement} li - Elemento HTML de la tarea.
    */
   /* Elimina una tarea del array y del DOM. */
-  function deleteTask(id, li) {
-    li.classList.add("borrando");
+function deleteTask(id, li) {
+  li.classList.add("borrando");
 
-    setTimeout(() => {
-      tasks = tasks.filter((task) => task.id !== id);
-      saveTasks();
-      updateStats();
-      li.remove();
-    }, 250);
-  }
+  setTimeout(() => {
+    tasks = tasks.filter((task) => task.id !== id);
+    saveTasks();
+    renderTasks(search.value.toLowerCase());
+    updateStats();
+  }, 250);
+}
 
   /* Cambia el estado completed de una tarea.*/
   function toggleTaskCompleted(id, checked) {
@@ -302,8 +303,11 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteButton.setAttribute("aria-label", `Eliminar tarea: ${task.title}`);
 
     deleteButton.addEventListener("click", () => {
-      deleteTask(task.id, li);
-    });
+  const confirmDelete = window.confirm("¿Seguro que quieres eliminar esta tarea?");
+  if (!confirmDelete) return;
+
+  deleteTask(task.id, li);
+});
 
     actions.appendChild(editButton);
     actions.appendChild(deleteButton);
@@ -312,7 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
     li.appendChild(meta);
     li.appendChild(typeBadge);
     li.appendChild(actions);
-
     list.appendChild(li);
   }
 
@@ -338,23 +341,26 @@ document.addEventListener("DOMContentLoaded", () => {
    * @param {string} query
    * @returns {Array} Lista de tareas filtradas.
    */
-  function getFilteredTasks(query = "") {
-    return tasks
-      .filter((task) => matchesQuery(task, query))
-      .filter((task) => matchesStatusFilter(task, currentFilter));
-  }
+function getFilteredTasks(query = "") {
+  return tasks
+    .filter((task) => matchesQuery(task, query))
+    .filter((task) => matchesStatusFilter(task, currentFilter))
+    .filter((task) => matchesTypeFilter(task, currentTypeFilter));
+}
 
   /**
  * Renderiza todas las tareas en el DOM aplicando los filtros activos.
  * @param {string} query - Texto de búsqueda introducido por el usuario.
  */
-  function renderTasks(query = "") {
-    list.innerHTML = "";
+function renderTasks(query = "") {
+  list.innerHTML = "";
 
-    const filteredTasks = getFilteredTasks(query);
+  const filteredTasks = getFilteredTasks(query);
 
-    filteredTasks.forEach((task) => renderTaskInDOM(task));
-  }
+  filteredTasks.forEach((task) => renderTaskInDOM(task));
+
+  emptyMessage.style.display = filteredTasks.length === 0 ? "block" : "none";
+}
 
   /* Elimina todas las tareas.*/
   function clearAllTasks() {
@@ -456,10 +462,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   if (filterType) {
-    filterType.addEventListener("change", () => {
-      currentTypeFilter = filterType.value;
-      renderTasks(search.value.toLowerCase());
-    });
-  }
+  filterType.addEventListener("change", () => {
+    currentTypeFilter = filterType.value;
+    renderTasks(search.value.toLowerCase());
+  });
+}
 
 });
