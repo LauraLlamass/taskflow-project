@@ -5,162 +5,134 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TaskFlow - Escritura de novelas</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' }</script>
   <link rel="stylesheet" href="styles.css" />
   <script src="app.js" defer></script>
 </head>
 
-<body class="bg-[#FAF5F8] text-[#2E1F27] p-4 font-serif dark:bg-slate-900 dark:text-slate-100">
-  <header class="relative w-full flex flex-col items-center gap-2 mb-8 pb-4 border-b-2 border-[#B76E79] text-center">
-    <h1 class="logo text-2xl md:text-3xl tracking-wider text-[#B76E79] font-bold font-serif m-0">
-      Tareas para escribir tu libro
-    </h1>
-    <p class="tagline text-sm opacity-75 m-0">
-      Organiza personajes, escaleta, capítulos y revisiones
-    </p>
+<body>
+  <header class="page-header">
+    <h1 class="logo">Tareas para escribir tu libro</h1>
+    <p class="tagline">Organiza personajes, escaleta, capítulos y revisiones</p>
   </header>
 
-  <button id="theme-toggle" type="button"
-    class="fixed top-4 right-4 rounded-full px-4 py-2 bg-[#B76E79] text-white shadow-md hover:opacity-90 transition">
-    🌙
-  </button>
+  <button id="theme-toggle" type="button" class="theme-toggle">🌙</button>
 
-  <main class="flex flex-col lg:flex-row gap-8 mt-8 items-start">
-    <section class="flex-1">
-      <h2 class="text-2xl font-bold text-center mb-8">Tareas de escritura</h2>
+  <main class="layout">
+    <section class="tasks-section">
 
-      <div class="mb-6 p-6 bg-white/60 border border-[#B76E79]/20 rounded-2xl">
-        <label for="task-search" class="block mb-2 text-lg font-semibold">Buscar tareas</label>
-        <input id="task-search" type="text" placeholder="Buscar tarea..." autocomplete="off"
-          class="w-full px-3 py-2 rounded-xl border border-black/15 bg-white dark:bg-slate-900 dark:text-white dark:border-slate-700 outline-none transition focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/20">
-      </div>
-
-      <div
-        class="mb-6 p-4 bg-white/60 text-lg dark:bg-white/60 border border-[#B76E79]/20 dark:border-slate-700 rounded-2xl">
-        <p class="mb-3 font-semibold">Filtrar tareas</p>
-        <div class="flex flex-wrap gap-2">
-          <button id="filter-all" type="button"
-            class="rounded-xl text-lg px-4 py-2 bg-white dark:bg-slate-900 dark:text-white border border-[#B76E79]/40 hover:bg-[#B76E79]/10 transition">
-            Todas
-          </button>
-          <button id="filter-pending" type="button"
-            class="rounded-xl text-lg px-4 py-2 bg-white dark:bg-slate-900 dark:text-white border border-[#B76E79]/40 hover:bg-[#B76E79]/10 transition">
-            Pendientes
-          </button>
-          <button id="filter-completed" type="button"
-            class="rounded-xl text-lg px-4 py-2 bg-white dark:bg-slate-900 dark:text-white border border-[#B76E79]/40 hover:bg-[#B76E79]/10 transition">
-            Completadas
-          </button>
-        </div>
-
-<select id="filter-type"
-  class="rounded-xl text-lg mt-3 px-4 py-2 bg-white dark:bg-slate-900 dark:text-white border border-[#B76E79]/40 hover:bg-[#B76E79]/10 transition">
-  <option value="all">Todos los tipos</option>
-  <option value="escaleta">Escaleta</option>
-  <option value="corregir">Corregir</option>
-  <option value="worldbuilding">Worldbuilding</option>
-  <option value="escribir">Escribir</option>
-</select>
-      </div>
-
-      <div class="mb-6 p-6 bg-white/60 border border-[#B76E79]/20 rounded-2xl">
-
-        <form id="task-form" class="flex flex-col md:flex-row items-start md:items-end gap-3">
-
-          <div class="flex-1 w-full">
-            <label for="task-input" class="block text-lg mb-2 font-semibold">Nueva tarea</label>
+      <div class="panel form-panel">
+        <form id="task-form" class="task-form">
+          <div class="form-group form-group-main">
+            <label for="task-input" class="form-label">Nueva tarea</label>
             <input id="task-input" type="text" placeholder="Ej. Crear ficha del protagonista" autocomplete="off"
-              class="w-full px-3 py-2 rounded-xl border border-black/15 bg-white dark:bg-slate-900 dark:text-white dark:border-slate-700 outline-none transition focus:border-[#B76E79] focus:ring-2 focus:ring-[#B76E79]/20" />
+              class="form-control" />
           </div>
 
-
-          <div class="w-full md:w-48">
-            <label for="task-type" class="block text-xl mb-2 font-semibold">Tipo</label>
-            <select id="task-type"
-              class="rounded-xl text-lg mt-3 px-4 py-2 bg-white dark:bg-slate-900 dark:text-white border border-[#B76E79]/40 hover:bg-[#B76E79]/10 transition">
-              <option value="escaleta">Escaleta</option>
-              <option value="corregir">Corregir</option>
-              <option value="worldbuilding">Worldbuilding</option>
-              <option value="escribir">Escribir</option>
+          <div class="form-group form-group-type">
+            <label for="task-type" class="form-label">Tipo</label>
+            <select id="task-type" class="form-select">
+              <option value="Escaleta">Escaleta</option>
+              <option value="Corregir">Corregir</option>
+              <option value="Worldbuilding">Worldbuilding</option>
+              <option value="Escribir">Escribir</option>
             </select>
           </div>
 
-          <button type="submit"
-            class="whitespace-nowrap rounded-xl px-4 py-2 bg-[#B76E79] text-white hover:opacity-90 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
+          <button type="submit" class="btn btn-primary">
             Añadir tarea
           </button>
-
         </form>
       </div>
 
-      <button id="complete-all" type="button"
-        class="mt-4 ml-2 text-sm rounded-full px-4 py-2 bg-white/60 dark:bgwhite/60 dark:text-white text-[#2E1F27] border border-[#B76E79]/40 shadow-sm hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-        Marcar todas como completadas
-      </button>
 
-      <button id="clear-completed" type="button"
-        class="mt-4 ml-2 text-sm rounded-full px-4 py-2 bg-white dark:bg-white/60 dark:text-white text-[#2E1F27] border border-[#B76E79]/40 shadow-sm hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-        Borrar completadas
-      </button>
 
-      <button id="tasks-clear" type="button"
-        class="mt-4 ml-2 text-sm rounded-full px-4 py-2 bg-white dark:bg-white/60 dark:text-white text-[#2E1F27] border border-[#B76E79]/40 shadow-sm hover:bg-[#B76E79]/10 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B76E79]">
-        Borrar todas las tareas
-      </button>
+      <div class="panel task-tools-panel">
+        <div class="task-tools-header">
+          <h2 class="panel-title">Gestión de tareas</h2>
+        </div>
 
-      <ul id="task-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 list-none p-0 mt-2"></ul>
-      <p id="empty-message" class="opacity-60 text-center mt-6">
+        <div class="task-search-group">
+          <input id="task-search" type="text" placeholder="Buscar tarea..." autocomplete="off" class="form-control" />
+        </div>
+
+        <div class="task-filters-row">
+          <div class="filter-buttons">
+            <button id="filter-all" type="button" class="filter-button active">Todas</button>
+            <button id="filter-pending" type="button" class="filter-button">Pendientes</button>
+            <button id="filter-completed" type="button" class="filter-button">Completadas</button>
+          </div>
+
+          <select id="filter-type" class="form-select filter-select">
+            <option value="all">Todos los tipos</option>
+            <option value="escaleta">Escaleta</option>
+            <option value="corregir">Corregir</option>
+            <option value="worldbuilding">Worldbuilding</option>
+            <option value="escribir">Escribir</option>
+          </select>
+        </div>
+      </div>
+      </div>
+      </div>
+
+
+      <div class="actions-row">
+        <button id="complete-all" type="button" class="btn btn-secondary">
+          Marcar todas como completadas
+        </button>
+
+        <button id="uncomplete-all" type="button" class="btn btn-secondary">
+          Marcar todas como incompletas
+        </button>
+
+        <button id="clear-completed" type="button" class="btn btn-secondary">
+          Borrar completadas
+        </button>
+
+        <button id="tasks-clear" type="button" class="btn btn-secondary">
+          Borrar todas las tareas
+        </button>
+      </div>
+
+      <ul id="task-list" class="task-list"></ul>
+
+      <p id="empty-message" class="empty-message">
         No hay tareas todavía. Añade tu primera tarea para empezar.
       </p>
-
     </section>
 
+    <aside class="sidebar panel">
+      <h2 class="sidebar-title">Estadísticas</h2>
 
-
-    <aside
-      class="w-full lg:w-80 p-6 bg-white/60 dark:bg-white/60 border border-[#B76E79]/20 dark:border-slate-700 rounded-2xl">
-      <h2 class="text-xl font-bold mb-4">Estadísticas</h2>
-
-      <div class="grid gap-3">
-        <div class="rounded-xl bg-white dark:bg-slate-800 p-4 border border-black/10 dark:border-slate-700 shadow-sm">
-          <p class="text-sm opacity-70 dark:text-slate-300">Total</p>
-          <p id="stats-total" class="text-lg font-bold text-[#2E1F27] dark:text-white">0</p>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <p class="stat-label">Total</p>
+          <p id="stats-total" class="stat-value">0</p>
         </div>
 
-        <div class="rounded-xl bg-white dark:bg-slate-800 p-4 border border-black/10 dark:border-slate-700 shadow-sm">
-          <p class="text-sm opacity-70 dark:text-slate-300">Completadas</p>
-          <p id="stats-completed" class="text-lg font-bold text-[#2E1F27] dark:text-white">0</p>
+        <div class="stat-card">
+          <p class="stat-label">Completadas</p>
+          <p id="stats-completed" class="stat-value">0</p>
         </div>
 
-        <div class="rounded-xl bg-white dark:bg-slate-800 p-4 border border-black/10 dark:border-slate-700 shadow-sm">
-          <p class="text-sm opacity-70 dark:text-slate-300">Pendientes</p>
-          <p id="stats-pending" class="text-lg font-bold text-[#2E1F27] dark:text-white">0</p>
+        <div class="stat-card">
+          <p class="stat-label">Pendientes</p>
+          <p id="stats-pending" class="stat-value">0</p>
         </div>
       </div>
 
-      <div class="mt-6">
-        <h3 class="text-xl font-semibold mb-3">Progreso</h3>
+      <div class="progress-section">
+        <h3 class="subsection-title">Progreso</h3>
 
-        <p id="progress-text" class="text-sm opacity-70 dark:text-slate-300 mb-2">
+        <p id="progress-text" class="progress-text">
           0 / 0 tareas completadas
         </p>
 
-        <div
-          class="w-full h-4 bg-white dark:bg-slate-900 rounded-full overflow-hidden border border-black/10 dark:border-slate-700">
-          <div id="progress-bar" class="h-full bg-[#B76E79] transition-all duration-300" style="width: 0%;"></div>
+        <div class="progress-track">
+          <div id="progress-bar" class="progress-bar" style="width: 0%;"></div>
         </div>
       </div>
 
-      <div class="mt-6">
-        <h3 class="text-lg font-semibold mb-3">Ejemplos de tareas</h3>
-        <ul class="list-disc pl-5 space-y-2 text-sm opacity-80">
-          <li>Crear ficha del protagonista</li>
-          <li>Definir el conflicto principal</li>
-          <li>Escribir la escaleta del capítulo 1</li>
-          <li>Revisar los diálogos</li>
-        </ul>
-      </div>
+
     </aside>
   </main>
 </body>
