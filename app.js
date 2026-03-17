@@ -4,10 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const list = document.querySelector("#task-list");
   const taskType = document.querySelector("#task-type");
   const search = document.querySelector("#task-search");
-  const clearBtn = document.querySelector("#tasks-clear");
+  const clearBtn = document.querySelector("#clear-all");
   const clearCompletedBtn = document.querySelector("#clear-completed");
-  const completeAllBtn = document.querySelector("#complete-all");
-  const uncompleteAllBtn = document.querySelector("#uncomplete-all");
+  const completeAllBtn = document.querySelector("#mark-all-complete");
+  const uncompleteAllBtn = document.querySelector("#mark-all-incomplete");
   const emptyMessage = document.querySelector("#empty-message");
   const filterType = document.querySelector("#filter-type");
 
@@ -21,40 +21,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const toggleBtn = document.querySelector("#theme-toggle");
   const body = document.body;
 
-  const filterAllBtn = document.querySelector("#filter-all");
-  const filterPendingBtn = document.querySelector("#filter-pending");
-  const filterCompletedBtn = document.querySelector("#filter-completed");
+  const filterAllBtn = document.querySelector("#filter-status-all");
+  const filterPendingBtn = document.querySelector("#filter-status-pending");
+  const filterCompletedBtn = document.querySelector("#filter-status-completed");
 
   let tasks = [];
   let currentFilter = "all";
   let currentTypeFilter = "all";
 
-  const savedTheme = localStorage.getItem("theme") || "light";
-  applyTheme(savedTheme);
+  const DEFAULT_TYPE = "escaleta";
+  const STORAGE_KEYS = {
+    tasks: "tasks",
+    theme: "theme",
+  };
 
-  function applyTheme(style) {
-    body.classList.remove("dark");
-
-    if (style === "dark") {
-      body.classList.add("dark");
-    }
-
-    if (toggleBtn) {
-      toggleBtn.textContent = style === "dark" ? "☀️" : "🌙";
-    }
+  function getSearchQuery() {
+    return search ? search.value.trim().toLowerCase() : "";
   }
 
-  if (toggleBtn) {
-    toggleBtn.addEventListener("click", () => {
-      const isDark = body.classList.toggle("dark");
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-      toggleBtn.textContent = isDark ? "☀️" : "🌙";
-    });
+  function refreshUI() {
+    renderTasks(getSearchQuery());
+    updateStats();
+    updateFilterButtons();
+    updateDocumentTitle();
+  }
+
+  function showMessage(message) {
+    window.alert(message);
   }
 
   function saveTasks() {
     try {
-      localStorage.setItem("tasks", JSON.stringify(tasks));
+      localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
     } catch (error) {
       console.error("Error al guardar tareas:", error);
     }
@@ -62,44 +60,110 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function loadTasks() {
     try {
-      const data = localStorage.getItem("tasks");
+      const data = localStorage.getItem(STORAGE_KEYS.tasks);
       tasks = data ? JSON.parse(data) : [];
-    } catch (err) {
-      console.warn("No se pudieron cargar las tareas:", err);
+    } catch (error) {
+      console.warn("No se pudieron cargar las tareas:", error);
       tasks = [];
     }
   }
 
-  function validateTask(title) {
-    if (typeof title !== "string") return false;
+  function applyTheme(theme) {
+    body.classList.toggle("dark", theme === "dark");
 
-    const normalizedTitle = title.trim();
-    if (!normalizedTitle) return false;
+    if (toggleBtn) {
+      toggleBtn.textContent = theme === "dark" ? "☀️" : "🌙";
+      toggleBtn.setAttribute("aria-pressed", String(theme === "dark"));
+    }
+  }
 
-    const lowerTitle = normalizedTitle.toLowerCase();
+  function toggleTheme() {
+    const isDark = body.classList.toggle("dark");
+    const newTheme = isDark ? "dark" : "light";
 
-    return !tasks.some(
-      (task) => task.title.trim().toLowerCase() === lowerTitle
-    );
+    localStorage.setItem(STORAGE_KEYS.theme, newTheme);
+
+    if (toggleBtn) {
+      toggleBtn.textContent = isDark ? "☀️" : "🌙";
+      toggleBtn.setAttribute("aria-pressed", String(isDark));
+    }
+  }
+
+  function normalizeTitle(title) {
+    return typeof title === "string" ? title.trim() : "";
+  }
+
+  function isDuplicateTitle(title, excludeId = null) {
+    const normalizedTitle = normalizeTitle(title).toLowerCase();
+
+    return tasks.some((task) => {
+      const sameId = excludeId !== null && task.id === excludeId;
+      return !sameId && task.title.trim().toLowerCase() === normalizedTitle;
+    });
+  }
+
+  function validateNewTask(title) {
+    const normalizedTitle = normalizeTitle(title);
+
+    if (!normalizedTitle) {
+      return {
+        valid: false,
+        message: "La tarea no puede estar vacía.",
+      };
+    }
+
+    if (isDuplicateTitle(normalizedTitle)) {
+      return {
+        valid: false,
+        message: "Ya existe una tarea con ese nombre.",
+      };
+    }
+
+    return {
+      valid: true,
+      message: "",
+    };
   }
 
   function validateEditedTask(id, title) {
-    const normalizedTitle = title.trim();
+    const normalizedTitle = normalizeTitle(title);
 
-    if (!normalizedTitle) return false;
+    if (!normalizedTitle) {
+      return {
+        valid: false,
+        message: "El título no puede estar vacío.",
+      };
+    }
 
-    return !tasks.some(
-      (task) =>
-        task.id !== id &&
-        task.title.trim().toLowerCase() === normalizedTitle.toLowerCase()
-    );
+    if (isDuplicateTitle(normalizedTitle, id)) {
+      return {
+        valid: false,
+        message: "Ya existe otra tarea con ese nombre.",
+      };
+    }
+
+    return {
+      valid: true,
+      message: "",
+    };
+  }
+
+  function createTask(title, type) {
+    return {
+      id: Date.now(),
+      title: normalizeTitle(title),
+      type: type || DEFAULT_TYPE,
+      completed: false,
+      createdAt: new Date().toISOString(),
+    };
   }
 
   function editTask(id, newTitle) {
-    const normalizedTitle = newTitle.trim();
+    const normalizedTitle = normalizeTitle(newTitle);
+    const validation = validateEditedTask(id, normalizedTitle);
 
-    if (!validateEditedTask(id, normalizedTitle)) {
-      alert("El título no puede estar vacío ni duplicado.");
+    if (!validation.valid) {
+      showMessage(validation.message);
       return;
     }
 
@@ -107,20 +171,86 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!taskToEdit) return;
 
     taskToEdit.title = normalizedTitle;
-
     saveTasks();
-    renderTasks(search ? search.value.toLowerCase() : "");
-    updateStats();
+    refreshUI();
   }
 
-  function createTask(title, type) {
-    return {
-      id: Date.now(),
-      title,
-      type,
+  function deleteTask(id, li) {
+    li.classList.add("borrando");
+
+    setTimeout(() => {
+      tasks = tasks.filter((task) => task.id !== id);
+      saveTasks();
+      refreshUI();
+    }, 250);
+  }
+
+  function toggleTaskCompleted(id, checked) {
+    tasks = tasks.map((task) =>
+      task.id === id ? { ...task, completed: checked } : task
+    );
+
+    saveTasks();
+    refreshUI();
+  }
+
+  function completeAllTasks() {
+    tasks = tasks.map((task) => ({
+      ...task,
+      completed: true,
+    }));
+
+    saveTasks();
+    refreshUI();
+  }
+
+  function uncompleteAllTasks() {
+    tasks = tasks.map((task) => ({
+      ...task,
       completed: false,
-      createdAt: new Date().toISOString(),
-    };
+    }));
+
+    saveTasks();
+    refreshUI();
+  }
+
+  function clearAllTasks() {
+    try {
+      localStorage.removeItem(STORAGE_KEYS.tasks);
+      tasks = [];
+      return true;
+    } catch (error) {
+      console.warn("No se pudieron eliminar las tareas:", error);
+      return false;
+    }
+  }
+
+  function clearCompletedTasks() {
+    tasks = tasks.filter((task) => !task.completed);
+    saveTasks();
+    refreshUI();
+  }
+
+  function matchesQuery(task, query) {
+    return task.title.toLowerCase().includes(query);
+  }
+
+  function matchesStatusFilter(task, filter) {
+    if (filter === "pending") return !task.completed;
+    if (filter === "completed") return task.completed;
+    return true;
+  }
+
+  function matchesTypeFilter(task, type) {
+    if (type === "all") return true;
+    return (task.type || DEFAULT_TYPE) === type;
+  }
+
+  function getFilteredTasks(query = "") {
+    return tasks
+      .filter((task) => matchesQuery(task, query))
+      .filter((task) => matchesStatusFilter(task, currentFilter))
+      .filter((task) => matchesTypeFilter(task, currentTypeFilter));
   }
 
   function getTaskStats(taskList) {
@@ -139,9 +269,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderProgressText({ total, completed }) {
-    if (progressText) {
-      progressText.textContent = `${completed} / ${total} tareas completadas`;
-    }
+    if (!progressText) return;
+    progressText.textContent = `${completed} / ${total} tareas completadas`;
   }
 
   function renderProgressBar({ percentage }) {
@@ -153,100 +282,68 @@ document.addEventListener("DOMContentLoaded", () => {
       : "#B76E79";
   }
 
+  function updateActionButtons() {
+    if (completeAllBtn) {
+      const hasPending = tasks.some((task) => !task.completed);
+      completeAllBtn.style.display = hasPending ? "inline-flex" : "none";
+    }
+
+    if (uncompleteAllBtn) {
+      const hasCompleted = tasks.some((task) => task.completed);
+      uncompleteAllBtn.style.display = hasCompleted ? "inline-flex" : "none";
+    }
+
+    if (clearCompletedBtn) {
+      const hasCompleted = tasks.some((task) => task.completed);
+      clearCompletedBtn.style.display = hasCompleted ? "inline-flex" : "none";
+    }
+
+    if (clearBtn) {
+      clearBtn.style.display = tasks.length > 0 ? "inline-flex" : "none";
+    }
+  }
+
   function updateStats() {
-  const stats = getTaskStats(tasks);
-  renderTaskStats(stats);
-  renderProgressText(stats);
-  renderProgressBar(stats);
-  updateActionButtons();
-}
-
-function updateActionButtons() {
-  if (completeAllBtn) {
-    const hasPending = tasks.some((task) => !task.completed);
-    completeAllBtn.style.display = hasPending ? "inline-flex" : "none";
+    const stats = getTaskStats(tasks);
+    renderTaskStats(stats);
+    renderProgressText(stats);
+    renderProgressBar(stats);
+    updateActionButtons();
   }
 
-  if (uncompleteAllBtn) {
-    const hasCompleted = tasks.some((task) => task.completed);
-    uncompleteAllBtn.style.display = hasCompleted ? "inline-flex" : "none";
-  }
-}
+  function updateDocumentTitle() {
+    const pending = tasks.filter((task) => !task.completed).length;
 
-  function deleteTask(id, li) {
-    li.classList.add("borrando");
+    if (pending === 0) {
+      document.title = "TaskFlow - Escritura de novelas";
+      return;
+    }
 
-    setTimeout(() => {
-      tasks = tasks.filter((task) => task.id !== id);
-      saveTasks();
-      renderTasks(search ? search.value.toLowerCase() : "");
-      updateStats();
-    }, 250);
+    document.title = `${pending} tarea${pending === 1 ? "" : "s"} pendiente${pending === 1 ? "" : "s"} - TaskFlow`;
   }
 
-  function toggleTaskCompleted(id, checked) {
-    tasks = tasks.map((task) =>
-      task.id === id ? { ...task, completed: checked } : task
-    );
+  function updateFilterButtons() {
+    const filterButtons = [
+      { element: filterAllBtn, value: "all" },
+      { element: filterPendingBtn, value: "pending" },
+      { element: filterCompletedBtn, value: "completed" },
+    ];
 
-    saveTasks();
-    renderTasks(search ? search.value.toLowerCase() : "");
-    updateStats();
-  }
-
-  function completeAllTasks() {
-    tasks = tasks.map((task) => ({
-      ...task,
-      completed: true,
-    }));
-
-    saveTasks();
-    renderTasks(search ? search.value.toLowerCase() : "");
-    updateStats();
-  }
-
-  function uncompleteAllTasks() {
-  tasks = tasks.map((task) => ({
-    ...task,
-    completed: false,
-  }));
-
-  saveTasks();
-  renderTasks(search ? search.value.toLowerCase() : "");
-  updateStats();
-}
-
-  function matchesQuery(task, query) {
-    return task.title.toLowerCase().includes(query);
-  }
-
-  function matchesStatusFilter(task, filter) {
-    if (filter === "pending") return !task.completed;
-    if (filter === "completed") return task.completed;
-    return true;
-  }
-
-  function matchesTypeFilter(task, type) {
-    if (type === "all") return true;
-    return (task.type || "escaleta") === type;
-  }
-
-  function getFilteredTasks(query = "") {
-    return tasks
-      .filter((task) => matchesQuery(task, query))
-      .filter((task) => matchesStatusFilter(task, currentFilter))
-      .filter((task) => matchesTypeFilter(task, currentTypeFilter));
+    filterButtons.forEach(({ element, value }) => {
+      if (!element) return;
+      element.classList.toggle("active", currentFilter === value);
+    });
   }
 
   function getTypeLabel(type) {
-    return type || "escaleta";
+    return type || DEFAULT_TYPE;
   }
 
   function getTypeClass(type) {
-    return `task-type task-type--${type || "escaleta"}`;
+    return `task-type task-type--${type || DEFAULT_TYPE}`;
   }
 
-  function renderTaskInDOM(task) {
+  function createTaskElement(task) {
     const li = document.createElement("li");
     li.className = task.completed ? "task-card task-completed" : "task-card";
 
@@ -275,9 +372,7 @@ function updateActionButtons() {
     typeBadge.className = getTypeClass(task.type);
     typeBadge.textContent = getTypeLabel(task.type);
 
-    content.appendChild(text);
-    content.appendChild(meta);
-    content.appendChild(typeBadge);
+    content.append(text, meta, typeBadge);
 
     const actions = document.createElement("div");
     actions.className = "task-actions";
@@ -306,75 +401,78 @@ function updateActionButtons() {
       deleteTask(task.id, li);
     });
 
-    actions.appendChild(editButton);
-    actions.appendChild(deleteButton);
+    actions.append(editButton, deleteButton);
+    li.append(checkbox, content, actions);
 
-    li.appendChild(checkbox);
-    li.appendChild(content);
-    li.appendChild(actions);
-
-    list.appendChild(li);
+    return li;
   }
 
   function renderTasks(query = "") {
+    if (!list) return;
+
     list.innerHTML = "";
 
     const filteredTasks = getFilteredTasks(query);
-    filteredTasks.forEach((task) => renderTaskInDOM(task));
+    const fragment = document.createDocumentFragment();
+
+    filteredTasks.forEach((task) => {
+      fragment.appendChild(createTaskElement(task));
+    });
+
+    list.appendChild(fragment);
 
     if (emptyMessage) {
       emptyMessage.style.display = filteredTasks.length === 0 ? "block" : "none";
     }
   }
 
-  function clearAllTasks() {
-    try {
-      localStorage.removeItem("tasks");
-      tasks = [];
-      return true;
-    } catch (err) {
-      console.warn("No se pudieron eliminar las tareas:", err);
-      return false;
-    }
+  function setStatusFilter(filter) {
+    currentFilter = filter;
+    refreshUI();
   }
 
-  function clearCompletedTasks() {
-    tasks = tasks.filter((task) => !task.completed);
-    saveTasks();
-    renderTasks(search ? search.value.toLowerCase() : "");
-    updateStats();
+  function initializeTheme() {
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.theme) || "light";
+    applyTheme(savedTheme);
   }
 
-  loadTasks();
-  renderTasks();
-  updateStats();
+  function initializeApp() {
+    loadTasks();
+    initializeTheme();
+    refreshUI();
+  }
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener("click", toggleTheme);
+  }
 
   if (form) {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
 
-      const title = input.value.trim();
-      if (!validateTask(title)) return;
+      const title = normalizeTitle(input.value);
+      const validation = validateNewTask(title);
 
-      const type = taskType.value;
-      const newTask = createTask(title, type);
+      if (!validation.valid) {
+        showMessage(validation.message);
+        input.focus();
+        return;
+      }
 
+      const newTask = createTask(title, taskType.value);
       tasks.unshift(newTask);
 
       saveTasks();
-      renderTasks(search ? search.value.toLowerCase() : "");
-      updateStats();
+      refreshUI();
 
       input.value = "";
-      taskType.value = "escaleta";
+      taskType.value = DEFAULT_TYPE;
       input.focus();
     });
   }
 
   if (search) {
-    search.addEventListener("input", () => {
-      renderTasks(search.value.toLowerCase());
-    });
+    search.addEventListener("input", refreshUI);
   }
 
   if (clearBtn) {
@@ -385,31 +483,9 @@ function updateActionButtons() {
       if (!ok) return;
       if (!clearAllTasks()) return;
 
-      renderTasks();
-      updateStats();
       if (search) search.value = "";
+      refreshUI();
       input.focus();
-    });
-  }
-
-  if (filterAllBtn) {
-    filterAllBtn.addEventListener("click", () => {
-      currentFilter = "all";
-      renderTasks(search ? search.value.toLowerCase() : "");
-    });
-  }
-
-  if (filterPendingBtn) {
-    filterPendingBtn.addEventListener("click", () => {
-      currentFilter = "pending";
-      renderTasks(search ? search.value.toLowerCase() : "");
-    });
-  }
-
-  if (filterCompletedBtn) {
-    filterCompletedBtn.addEventListener("click", () => {
-      currentFilter = "completed";
-      renderTasks(search ? search.value.toLowerCase() : "");
     });
   }
 
@@ -422,40 +498,45 @@ function updateActionButtons() {
   }
 
   if (completeAllBtn) {
-    completeAllBtn.addEventListener("click", () => {
-      completeAllTasks();
-    });
+    completeAllBtn.addEventListener("click", completeAllTasks);
   }
 
   if (uncompleteAllBtn) {
-  uncompleteAllBtn.addEventListener("click", () => {
-    uncompleteAllTasks();
-  });
-}
+    uncompleteAllBtn.addEventListener("click", uncompleteAllTasks);
+  }
+
+  if (filterAllBtn) {
+    filterAllBtn.addEventListener("click", () => setStatusFilter("all"));
+  }
+
+  if (filterPendingBtn) {
+    filterPendingBtn.addEventListener("click", () => setStatusFilter("pending"));
+  }
+
+  if (filterCompletedBtn) {
+    filterCompletedBtn.addEventListener("click", () => setStatusFilter("completed"));
+  }
 
   if (filterType) {
     filterType.addEventListener("change", () => {
       currentTypeFilter = filterType.value;
-      renderTasks(search ? search.value.toLowerCase() : "");
+      refreshUI();
     });
   }
 
-  document.addEventListener("click", function(e) {
+  document.addEventListener("click", (event) => {
+    const card = event.target.closest(".task-card");
+    if (!card) return;
 
-  const card = e.target.closest(".task-card");
-  if (!card) return;
+    const checkbox = card.querySelector(".task-checkbox");
+    if (!checkbox) return;
 
-  const checkbox = card.querySelector(".task-checkbox");
-  if (!checkbox) return;
+    if (event.target.classList.contains("task-checkbox")) return;
+    if (event.target.closest(".task-actions")) return;
 
-  // evitar doble activación si se pulsa el checkbox
-  if (e.target.classList.contains("task-checkbox")) return;
+    checkbox.checked = !checkbox.checked;
+    checkbox.dispatchEvent(new Event("change"));
+  });
 
-  checkbox.checked = !checkbox.checked;
-
-  // dispara el evento change por si tu app lo usa
-  checkbox.dispatchEvent(new Event("change"));
-
-});
-
+  initializeApp();
 });

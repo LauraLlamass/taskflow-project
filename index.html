@@ -11,12 +11,11 @@
 
 <body>
   <header class="page-header">
-    <h1 class="logo">Tareas para escribir tu libro</h1>
+    <h1 class="logo">Gestor de tareas para escribir tu libro</h1>
     <p class="tagline">Organiza personajes, escaleta, capítulos y revisiones</p>
   </header>
 
-  <button id="theme-toggle" type="button" class="theme-toggle">🌙</button>
-
+  <button id="theme-toggle" type="button" class="theme-toggle" aria-label="Cambiar tema">🌙</button>
   <main class="layout">
     <section class="tasks-section">
 
@@ -25,16 +24,16 @@
           <div class="form-group form-group-main">
             <label for="task-input" class="form-label">Nueva tarea</label>
             <input id="task-input" type="text" placeholder="Ej. Crear ficha del protagonista" autocomplete="off"
-              class="form-control" />
+              class="form-control" required />
           </div>
 
           <div class="form-group form-group-type">
             <label for="task-type" class="form-label">Tipo</label>
             <select id="task-type" class="form-select">
-              <option value="Escaleta">Escaleta</option>
-              <option value="Corregir">Corregir</option>
-              <option value="Worldbuilding">Worldbuilding</option>
-              <option value="Escribir">Escribir</option>
+              <option value="escaleta">Escaleta</option>
+              <option value="corregir">Corregir</option>
+              <option value="worldbuilding">Worldbuilding</option>
+              <option value="escribir">Escribir</option>
             </select>
           </div>
 
@@ -44,12 +43,8 @@
         </form>
       </div>
 
-
-
       <div class="panel task-tools-panel">
-        <div class="task-tools-header">
-          <h2 class="panel-title">Gestión de tareas</h2>
-        </div>
+        <h2 class="panel-title">Gestión de tareas</h2>
 
         <div class="task-search-group">
           <input id="task-search" type="text" placeholder="Buscar tarea..." autocomplete="off" class="form-control" />
@@ -57,9 +52,9 @@
 
         <div class="task-filters-row">
           <div class="filter-buttons">
-            <button id="filter-all" type="button" class="filter-button active">Todas</button>
-            <button id="filter-pending" type="button" class="filter-button">Pendientes</button>
-            <button id="filter-completed" type="button" class="filter-button">Completadas</button>
+            <button id="filter-status-all" type="button" class="filter-button active">Todas</button>
+            <button id="filter-status-pending" type="button" class="filter-button">Pendientes</button>
+            <button id="filter-status-completed" type="button" class="filter-button">Completadas</button>
           </div>
 
           <select id="filter-type" class="form-select filter-select">
@@ -71,16 +66,13 @@
           </select>
         </div>
       </div>
-      </div>
-      </div>
-
 
       <div class="actions-row">
-        <button id="complete-all" type="button" class="btn btn-secondary">
+        <button id="mark-all-complete" type="button" class="btn btn-secondary">
           Marcar todas como completadas
         </button>
 
-        <button id="uncomplete-all" type="button" class="btn btn-secondary">
+        <button id="mark-all-incomplete" type="button" class="btn btn-secondary">
           Marcar todas como incompletas
         </button>
 
@@ -88,7 +80,7 @@
           Borrar completadas
         </button>
 
-        <button id="tasks-clear" type="button" class="btn btn-secondary">
+        <button id="clear-all" type="button" class="btn btn-secondary">
           Borrar todas las tareas
         </button>
       </div>
@@ -128,11 +120,9 @@
         </p>
 
         <div class="progress-track">
-          <div id="progress-bar" class="progress-bar" style="width: 0%;"></div>
+          <div id="progress-bar" class="progress-bar"></div>
         </div>
       </div>
-
-
     </aside>
   </main>
 </body>
