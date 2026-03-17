@@ -336,7 +336,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getTypeLabel(type) {
-    return type || DEFAULT_TYPE;
+    return type.toUpperCase() || DEFAULT_TYPE.toUpperCase();
   }
 
   function getTypeClass(type) {
@@ -382,11 +382,69 @@ document.addEventListener("DOMContentLoaded", () => {
     editButton.className = "task-edit";
     editButton.textContent = "✏️";
     editButton.setAttribute("aria-label", `Editar tarea: ${task.title}`);
+    editButton.addEventListener("click", (event) => {
+      event.stopPropagation();
 
-    editButton.addEventListener("click", () => {
-      const newTitle = window.prompt("Edita el título de la tarea:", task.title);
-      if (newTitle === null) return;
-      editTask(task.id, newTitle);
+      if (content.querySelector(".task-edit-form")) return;
+
+      text.classList.add("task-hidden");
+      meta.classList.add("task-hidden");
+      typeBadge.classList.add("task-hidden");
+
+      const editForm = document.createElement("form");
+      editForm.className = "task-edit-form";
+
+      const editInput = document.createElement("input");
+      editInput.type = "text";
+      editInput.className = "task-edit-input";
+      editInput.value = task.title;
+
+      const inlineActions = document.createElement("div");
+      inlineActions.className = "task-edit-actions-inline";
+
+      const saveButton = document.createElement("button");
+      saveButton.type = "submit";
+      saveButton.className = "btn btn-primary";
+      saveButton.textContent = "Guardar";
+
+      const cancelButton = document.createElement("button");
+      cancelButton.type = "button";
+      cancelButton.className = "btn btn-secondary";
+      cancelButton.textContent = "Cancelar";
+
+      cancelButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        editForm.remove();
+        text.classList.remove("task-hidden");
+        meta.classList.remove("task-hidden");
+        typeBadge.classList.remove("task-hidden");
+      });
+
+      editForm.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
+
+      editForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        editTask(task.id, editInput.value);
+      });
+
+      editInput.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          editForm.remove();
+          text.classList.remove("task-hidden");
+          meta.classList.remove("task-hidden");
+          typeBadge.classList.remove("task-hidden");
+        }
+      });
+
+      inlineActions.append(saveButton, cancelButton);
+      editForm.append(editInput, inlineActions);
+      content.prepend(editForm);
+
+      editInput.focus();
+      editInput.select();
     });
 
     const deleteButton = document.createElement("button");
@@ -533,6 +591,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (event.target.classList.contains("task-checkbox")) return;
     if (event.target.closest(".task-actions")) return;
+    if (event.target.closest(".task-edit-form")) return;
 
     checkbox.checked = !checkbox.checked;
     checkbox.dispatchEvent(new Event("change"));
