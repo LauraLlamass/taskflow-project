@@ -10,6 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const uncompleteAllBtn = document.querySelector("#mark-all-incomplete");
   const emptyMessage = document.querySelector("#empty-message");
   const filterType = document.querySelector("#filter-type");
+  const networkStatus = document.querySelector("#network-status");
 
   const progressText = document.querySelector("#progress-text");
   const progressBar = document.querySelector("#progress-bar");
@@ -28,10 +29,11 @@ document.addEventListener("DOMContentLoaded", () => {
   let tasks = [];
   let currentFilter = "all";
   let currentTypeFilter = "all";
+  let isLoading = false;
+  let errorMessage = "";
 
   const DEFAULT_TYPE = "escaleta";
   const STORAGE_KEYS = {
-    tasks: "tasks",
     theme: "theme",
   };
 
@@ -40,6 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function refreshUI() {
+    renderNetworkState();
     renderTasks(getSearchQuery());
     updateStats();
     updateFilterButtons();
@@ -50,21 +53,27 @@ document.addEventListener("DOMContentLoaded", () => {
     window.alert(message);
   }
 
-  function saveTasks() {
-    try {
-      localStorage.setItem(STORAGE_KEYS.tasks, JSON.stringify(tasks));
-    } catch (error) {
-      console.error("Error al guardar tareas:", error);
-    }
-  }
+  function renderNetworkState() {
+    if (!networkStatus) return;
 
-  function loadTasks() {
-    try {
-      const data = localStorage.getItem(STORAGE_KEYS.tasks);
-      tasks = data ? JSON.parse(data) : [];
-    } catch (error) {
-      console.warn("No se pudieron cargar las tareas:", error);
-      tasks = [];
+    networkStatus.textContent = "";
+    networkStatus.className = "network-status";
+
+    if (isLoading) {
+      networkStatus.textContent = "Cargando...";
+      networkStatus.classList.add("is-loading");
+      return;
+    }
+
+    if (errorMessage) {
+      networkStatus.textContent = errorMessage;
+      networkStatus.classList.add("is-error");
+      return;
+    }
+
+    if (tasks.length >= 0) {
+      networkStatus.textContent = "Servidor conectado correctamente";
+      networkStatus.classList.add("is-success");
     }
   }
 
@@ -148,87 +157,160 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   }
 
-  function createTask(title, type) {
-    return {
-      id: Date.now(),
-      title: normalizeTitle(title),
-      type: type || DEFAULT_TYPE,
-      completed: false,
-      createdAt: new Date().toISOString(),
-    };
-  }
 
-  function editTask(id, newTitle) {
+
+  async function editTask(id, newTitle) {
     const normalizedTitle = normalizeTitle(newTitle);
     const validation = validateEditedTask(id, normalizedTitle);
 
     if (!validation.valid) {
       showMessage(validation.message);
-      return;
+      return false;
     }
 
-    const taskToEdit = tasks.find((task) => task.id === id);
-    if (!taskToEdit) return;
+    try {
+      isLoading = true;
+      errorMessage = "";
+      refreshUI();
 
-    taskToEdit.title = normalizedTitle;
-    saveTasks();
-    refreshUI();
+      const updatedTask = await window.apiClient.updateTask(id, {
+        title: normalizedTitle,
+      });
+
+      tasks = tasks.map((task) =>
+        task.id === id ? { ...task, ...updatedTask } : task
+      );
+
+      return true;
+    } catch (error) {
+      console.error(error);
+      errorMessage = error.message || "No se pudo editar la tarea.";
+      showMessage(errorMessage);
+      return false;
+    } finally {
+      isLoading = false;
+      refreshUI();
+    }
   }
 
-  function deleteTask(id, li) {
+  async function deleteTask(id, li) {
     li.classList.add("borrando");
 
-    setTimeout(() => {
-      tasks = tasks.filter((task) => task.id !== id);
-      saveTasks();
-      refreshUI();
+    setTimeout(async () => {
+      try {
+        isLoading = true;
+        errorMessage = "";
+        refreshUI();
+
+        await window.apiClient.deleteTask(id);
+        tasks = tasks.filter((task) => task.id !== id);
+      } catch (error) {
+        console.error(error);
+        errorMessage = error.message || "No se pudo eliminar la tarea.";
+        showMessage(errorMessage);
+        li.classList.remove("borrando");
+      } finally {
+        isLoading = false;
+        refreshUI();
+      }
     }, 250);
   }
 
-  function toggleTaskCompleted(id, checked) {
-    tasks = tasks.map((task) =>
-      task.id === id ? { ...task, completed: checked } : task
-    );
-
-    saveTasks();
-    refreshUI();
-  }
-
-  function completeAllTasks() {
-    tasks = tasks.map((task) => ({
-      ...task,
-      completed: true,
-    }));
-
-    saveTasks();
-    refreshUI();
-  }
-
-  function uncompleteAllTasks() {
-    tasks = tasks.map((task) => ({
-      ...task,
-      completed: false,
-    }));
-
-    saveTasks();
-    refreshUI();
-  }
-
-  function clearAllTasks() {
+  async function toggleTaskCompleted(id, checked) {
     try {
-      localStorage.removeItem(STORAGE_KEYS.tasks);
-      tasks = [];
-      return true;
+      isLoading = true;
+      errorMessage = "";
+      refreshUI();
+
+      const updatedTask = await window.apiClient.updateTask(id, {
+        completed: checked,
+      });
+
+      tasks = tasks.map((task) =>
+        task.id === id ? { ...task, ...updatedTask } : task
+      );
     } catch (error) {
-      console.warn("No se pudieron eliminar las tareas:", error);
-      return false;
+      console.error(error);
+      errorMessage = error.message || "No se pudo actualizar la tarea.";
+      showMessage(errorMessage);
+    } finally {
+      isLoading = false;
+      refreshUI();
     }
   }
 
-  function clearCompletedTasks() {
-    tasks = tasks.filter((task) => !task.completed);
-    saveTasks();
-    refreshUI();
+  async function completeAllTasks() {
+    try {
+      isLoading = true;
+      errorMessage = "";
+      refreshUI();
+
+      const updatedTasks = await window.apiClient.completeAllTasks();
+      tasks = updatedTasks;
+    } catch (error) {
+      console.error(error);
+      errorMessage = error.message || "No se pudieron completar todas las tareas.";
+      showMessage(errorMessage);
+    } finally {
+      isLoading = false;
+      refreshUI();
+    }
+  }
+
+  async function uncompleteAllTasks() {
+    try {
+      isLoading = true;
+      errorMessage = "";
+      refreshUI();
+
+      const updatedTasks = await window.apiClient.uncompleteAllTasks();
+      tasks = updatedTasks;
+    } catch (error) {
+      console.error(error);
+      errorMessage = error.message || "No se pudieron desmarcar todas las tareas.";
+      showMessage(errorMessage);
+    } finally {
+      isLoading = false;
+      refreshUI();
+    }
+  }
+
+  async function clearAllTasks() {
+    try {
+      isLoading = true;
+      errorMessage = "";
+      refreshUI();
+
+      await window.apiClient.clearAllTasks();
+      tasks = [];
+      return true;
+    } catch (error) {
+      console.error(error);
+      errorMessage = error.message || "No se pudieron borrar todas las tareas.";
+      showMessage(errorMessage);
+      return false;
+    } finally {
+      isLoading = false;
+      refreshUI();
+    }
+  }
+
+  async function clearCompletedTasks() {
+    try {
+      isLoading = true;
+      errorMessage = "";
+      refreshUI();
+
+      await window.apiClient.clearCompletedTasks();
+      tasks = tasks.filter((task) => !task.completed);
+    } catch (error) {
+      console.error(error);
+      errorMessage = error.message || "No se pudieron borrar las tareas completadas.";
+      showMessage(errorMessage);
+    } finally {
+      isLoading = false;
+      refreshUI();
+    }
   }
 
   function matchesQuery(task, query) {
@@ -335,9 +417,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function getTypeLabel(type) {
-    return type.toUpperCase() || DEFAULT_TYPE.toUpperCase();
-  }
+function getTypeLabel(type) {
+  return (type || DEFAULT_TYPE).toUpperCase();
+}
 
   function getTypeClass(type) {
     return `task-type task-type--${type || DEFAULT_TYPE}`;
@@ -424,10 +506,18 @@ document.addEventListener("DOMContentLoaded", () => {
         event.stopPropagation();
       });
 
-      editForm.addEventListener("submit", (event) => {
+      editForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         event.stopPropagation();
-        editTask(task.id, editInput.value);
+
+        const updated = await editTask(task.id, editInput.value);
+
+        if (updated) {
+          editForm.remove();
+          text.classList.remove("task-hidden");
+          meta.classList.remove("task-hidden");
+          typeBadge.classList.remove("task-hidden");
+        }
       });
 
       editInput.addEventListener("keydown", (event) => {
@@ -453,10 +543,10 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteButton.textContent = "🗑️";
     deleteButton.setAttribute("aria-label", `Eliminar tarea: ${task.title}`);
 
-    deleteButton.addEventListener("click", () => {
+    deleteButton.addEventListener("click", async () => {
       const confirmDelete = window.confirm("¿Seguro que quieres eliminar esta tarea?");
       if (!confirmDelete) return;
-      deleteTask(task.id, li);
+      await deleteTask(task.id, li);
     });
 
     actions.append(editButton, deleteButton);
@@ -494,18 +584,32 @@ document.addEventListener("DOMContentLoaded", () => {
     applyTheme(savedTheme);
   }
 
-  function initializeApp() {
-    loadTasks();
+  async function initializeApp() {
     initializeTheme();
-    refreshUI();
+
+    try {
+      isLoading = true;
+      errorMessage = "";
+      refreshUI();
+
+      tasks = await window.apiClient.getTasks();
+    } catch (error) {
+      console.error("No se pudieron cargar las tareas:", error);
+      errorMessage = "No se pudieron cargar las tareas del servidor.";
+      showMessage(errorMessage);
+      tasks = [];
+    } finally {
+      isLoading = false;
+      refreshUI();
+    }
   }
 
   if (toggleBtn) {
     toggleBtn.addEventListener("click", toggleTheme);
   }
 
-  if (form) {
-    form.addEventListener("submit", (event) => {
+   if (form) {
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
 
       const title = normalizeTitle(input.value);
@@ -517,15 +621,30 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      const newTask = createTask(title, taskType.value);
-      tasks.unshift(newTask);
+      try {
+        isLoading = true;
+        errorMessage = "";
+        refreshUI();
 
-      saveTasks();
-      refreshUI();
+        const newTask = await window.apiClient.createTask({
+          title,
+          type: taskType.value || DEFAULT_TYPE,
+          completed: false,
+        });
 
-      input.value = "";
-      taskType.value = DEFAULT_TYPE;
-      input.focus();
+        tasks.unshift(newTask);
+
+        input.value = "";
+        taskType.value = DEFAULT_TYPE;
+        input.focus();
+      } catch (error) {
+        console.error(error);
+        errorMessage = error.message || "No se pudo crear la tarea.";
+        showMessage(errorMessage);
+      } finally {
+        isLoading = false;
+        refreshUI();
+      }
     });
   }
 
@@ -533,69 +652,72 @@ document.addEventListener("DOMContentLoaded", () => {
     search.addEventListener("input", refreshUI);
   }
 
-  if (clearBtn) {
-    clearBtn.addEventListener("click", () => {
-      const ok = window.confirm(
-        "¿Seguro que quieres borrar todas las tareas? Esta acción no se puede deshacer."
-      );
-      if (!ok) return;
-      if (!clearAllTasks()) return;
+if (clearBtn) {
+  clearBtn.addEventListener("click", async () => {
+    const ok = window.confirm(
+      "¿Seguro que quieres borrar todas las tareas? Esta acción no se puede deshacer."
+    );
+    if (!ok) return;
 
-      if (search) search.value = "";
-      refreshUI();
-      input.focus();
-    });
-  }
+    const deleted = await clearAllTasks();
+    if (!deleted) return;
 
-  if (clearCompletedBtn) {
-    clearCompletedBtn.addEventListener("click", () => {
-      const ok = window.confirm("¿Seguro que quieres borrar todas las tareas completadas?");
-      if (!ok) return;
-      clearCompletedTasks();
-    });
-  }
-
-  if (completeAllBtn) {
-    completeAllBtn.addEventListener("click", completeAllTasks);
-  }
-
-  if (uncompleteAllBtn) {
-    uncompleteAllBtn.addEventListener("click", uncompleteAllTasks);
-  }
-
-  if (filterAllBtn) {
-    filterAllBtn.addEventListener("click", () => setStatusFilter("all"));
-  }
-
-  if (filterPendingBtn) {
-    filterPendingBtn.addEventListener("click", () => setStatusFilter("pending"));
-  }
-
-  if (filterCompletedBtn) {
-    filterCompletedBtn.addEventListener("click", () => setStatusFilter("completed"));
-  }
-
-  if (filterType) {
-    filterType.addEventListener("change", () => {
-      currentTypeFilter = filterType.value;
-      refreshUI();
-    });
-  }
-
-  document.addEventListener("click", (event) => {
-    const card = event.target.closest(".task-card");
-    if (!card) return;
-
-    const checkbox = card.querySelector(".task-checkbox");
-    if (!checkbox) return;
-
-    if (event.target.classList.contains("task-checkbox")) return;
-    if (event.target.closest(".task-actions")) return;
-    if (event.target.closest(".task-edit-form")) return;
-
-    checkbox.checked = !checkbox.checked;
-    checkbox.dispatchEvent(new Event("change"));
+    if (search) search.value = "";
+    refreshUI();
+    input.focus();
   });
+}
 
-  initializeApp();
+if (clearCompletedBtn) {
+  clearCompletedBtn.addEventListener("click", async () => {
+    const ok = window.confirm("¿Seguro que quieres borrar todas las tareas completadas?");
+    if (!ok) return;
+    await clearCompletedTasks();
+  });
+}
+
+if (completeAllBtn) {
+  completeAllBtn.addEventListener("click", completeAllTasks);
+}
+
+if (uncompleteAllBtn) {
+  uncompleteAllBtn.addEventListener("click", uncompleteAllTasks);
+}
+
+if (filterAllBtn) {
+  filterAllBtn.addEventListener("click", () => setStatusFilter("all"));
+}
+
+if (filterPendingBtn) {
+  filterPendingBtn.addEventListener("click", () => setStatusFilter("pending"));
+}
+
+if (filterCompletedBtn) {
+  filterCompletedBtn.addEventListener("click", () => setStatusFilter("completed"));
+}
+
+if (filterType) {
+  filterType.addEventListener("change", () => {
+    currentTypeFilter = filterType.value;
+    refreshUI();
+  });
+}
+
+document.addEventListener("click", (event) => {
+  const card = event.target.closest(".task-card");
+  if (!card) return;
+
+  const checkbox = card.querySelector(".task-checkbox");
+  if (!checkbox) return;
+
+  if (event.target.classList.contains("task-checkbox")) return;
+  if (event.target.closest(".task-actions")) return;
+  if (event.target.closest(".task-edit-form")) return;
+
+  checkbox.checked = !checkbox.checked;
+  checkbox.dispatchEvent(new Event("change"));
+
+    initializeApp();
+
+});
 });

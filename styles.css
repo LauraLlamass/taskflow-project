@@ -595,6 +595,32 @@ body.dark .btn-secondary {
   display: none;
 }
 
+.network-status {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  display: none;
+}
+
+.network-status.is-loading {
+  display: block;
+  background-color: #fff4d6;
+  color: #7a5d00;
+}
+
+.network-status.is-error {
+  display: block;
+  background-color: #ffe0e0;
+  color: #8a1f1f;
+}
+
+.network-status.is-success {
+  display: block;
+  background-color: #e4f7e7;
+  color: #1e6b34;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .layout {
