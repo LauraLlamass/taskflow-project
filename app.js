@@ -336,13 +336,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function getTaskStats(taskList) {
-    const total = taskList.length;
-    const completed = taskList.filter((task) => task.completed).length;
-    const pending = total - completed;
-    const percentage = total === 0 ? 0 : (completed / total) * 100;
+  const total = taskList.length;
+  const completed = taskList.filter((task) => task.completed).length;
+  const pending = total - completed;
+  const percentage = total === 0 ? 0 : (completed / total) * 100;
 
-    return { total, completed, pending, percentage };
-  }
+  return { total, completed, pending, percentage };
+}
 
   function renderTaskStats({ total, completed, pending }) {
     if (totalEl) totalEl.textContent = total;
@@ -593,12 +593,16 @@ function getTypeLabel(type) {
       refreshUI();
 
       tasks = await window.apiClient.getTasks();
-    } catch (error) {
+    } 
+
+    catch (error) {
       console.error("No se pudieron cargar las tareas:", error);
       errorMessage = "No se pudieron cargar las tareas del servidor.";
       showMessage(errorMessage);
       tasks = [];
-    } finally {
+    } 
+
+    finally {
       isLoading = false;
       refreshUI();
     }
@@ -716,8 +720,7 @@ document.addEventListener("click", (event) => {
 
   checkbox.checked = !checkbox.checked;
   checkbox.dispatchEvent(new Event("change"));
-
-    initializeApp();
-
 });
+
+initializeApp();
 });

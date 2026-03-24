@@ -1,14 +1,35 @@
-const API_BASE_URL = "http://localhost:3000/api/v1/tasks";
+const isLocalFrontend =
+  window.location.hostname === "localhost" ||
+  window.location.hostname === "127.0.0.1";
+
+const API_BASE_URL = isLocalFrontend
+  ? "http://localhost:3000/api/v1/tasks"
+  : "/api/v1/tasks";
+
+async function parseJsonSafe(response) {
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
+}
+
+async function parseError(response, fallbackMessage) {
+  try {
+    const data = await parseJsonSafe(response);
+    return data?.message || data?.error || fallbackMessage;
+  } catch {
+    return fallbackMessage;
+  }
+}
 
 window.apiClient = {
   async getTasks() {
     const response = await fetch(API_BASE_URL);
 
     if (!response.ok) {
-      throw new Error("No se pudieron cargar las tareas");
+      throw new Error(await parseError(response, "No se pudieron cargar las tareas"));
     }
 
-    return response.json();
+    const data = await parseJsonSafe(response);
+    return data ?? [];
   },
 
   async createTask(taskData) {
@@ -20,13 +41,12 @@ window.apiClient = {
       body: JSON.stringify(taskData),
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      throw new Error(data.message || data.error || "No se pudo crear la tarea");
+      throw new Error(await parseError(response, "No se pudo crear la tarea"));
     }
 
-    return data;
+    const data = await parseJsonSafe(response);
+    return data ?? taskData;
   },
 
   async updateTask(id, taskData) {
@@ -38,13 +58,12 @@ window.apiClient = {
       body: JSON.stringify(taskData),
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      throw new Error(data.message || data.error || "No se pudo actualizar la tarea");
+      throw new Error(await parseError(response, "No se pudo actualizar la tarea"));
     }
 
-    return data;
+    const data = await parseJsonSafe(response);
+    return data ?? { id, ...taskData };
   },
 
   async deleteTask(id) {
@@ -53,16 +72,7 @@ window.apiClient = {
     });
 
     if (!response.ok) {
-      let errorMessage = "No se pudo eliminar la tarea";
-
-      try {
-        const data = await response.json();
-        errorMessage = data.message || data.error || errorMessage;
-      } catch {
-        // ignore
-      }
-
-      throw new Error(errorMessage);
+      throw new Error(await parseError(response, "No se pudo eliminar la tarea"));
     }
 
     return true;
@@ -77,13 +87,12 @@ window.apiClient = {
       body: JSON.stringify({ action: "complete_all" }),
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      throw new Error(data.message || data.error || "No se pudieron completar todas las tareas");
+      throw new Error(await parseError(response, "No se pudieron completar todas las tareas"));
     }
 
-    return data;
+    const data = await parseJsonSafe(response);
+    return data ?? [];
   },
 
   async uncompleteAllTasks() {
@@ -95,13 +104,12 @@ window.apiClient = {
       body: JSON.stringify({ action: "uncomplete_all" }),
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      throw new Error(data.message || data.error || "No se pudieron desmarcar todas las tareas");
+      throw new Error(await parseError(response, "No se pudieron desmarcar todas las tareas"));
     }
 
-    return data;
+    const data = await parseJsonSafe(response);
+    return data ?? [];
   },
 
   async clearAllTasks() {
@@ -110,16 +118,7 @@ window.apiClient = {
     });
 
     if (!response.ok) {
-      let errorMessage = "No se pudieron borrar todas las tareas";
-
-      try {
-        const data = await response.json();
-        errorMessage = data.message || data.error || errorMessage;
-      } catch {
-        // ignore
-      }
-
-      throw new Error(errorMessage);
+      throw new Error(await parseError(response, "No se pudieron borrar todas las tareas"));
     }
 
     return true;
@@ -131,16 +130,7 @@ window.apiClient = {
     });
 
     if (!response.ok) {
-      let errorMessage = "No se pudieron borrar las tareas completadas";
-
-      try {
-        const data = await response.json();
-        errorMessage = data.message || data.error || errorMessage;
-      } catch {
-        // ignore
-      }
-
-      throw new Error(errorMessage);
+      throw new Error(await parseError(response, "No se pudieron borrar las tareas completadas"));
     }
 
     return true;
